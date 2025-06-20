@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { ArrowLeft, ArrowRight, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -42,6 +41,22 @@ const SchedulePicker = ({
 
   const minDeliveryDate = pickupDate ? new Date(pickupDate.getTime() + 2 * 24 * 60 * 60 * 1000) : tomorrow;
 
+  // Function to check if a date is Thursday (4) or Saturday (6)
+  const isThursdayOrSaturday = (date: Date) => {
+    const day = date.getDay();
+    return day === 4 || day === 6; // 4 = Thursday, 6 = Saturday
+  };
+
+  // Disable dates that are not Thursday or Saturday, or are before tomorrow
+  const isPickupDateDisabled = (date: Date) => {
+    return date < tomorrow || !isThursdayOrSaturday(date);
+  };
+
+  // Disable dates that are not Thursday or Saturday, or are before minimum delivery date
+  const isDeliveryDateDisabled = (date: Date) => {
+    return date < minDeliveryDate || !isThursdayOrSaturday(date);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
@@ -51,7 +66,7 @@ const SchedulePicker = ({
             Back to Clothes
           </Button>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Schedule Pickup & Delivery</h1>
-          <p className="text-gray-600">Choose your preferred pickup and delivery dates. We provide 48-72 hour service.</p>
+          <p className="text-gray-600">Choose your preferred pickup and delivery dates. We provide 48-72 hour service on Thursdays and Saturdays only.</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
@@ -63,7 +78,7 @@ const SchedulePicker = ({
                 Pickup Date
               </CardTitle>
               <CardDescription>
-                When should we collect your clothes?
+                When should we collect your clothes? (Thursdays & Saturdays only)
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -88,7 +103,7 @@ const SchedulePicker = ({
                       setPickupDate(date);
                       setPickupOpen(false);
                     }}
-                    disabled={(date) => date < tomorrow}
+                    disabled={isPickupDateDisabled}
                     initialFocus
                     className="pointer-events-auto"
                   />
@@ -123,7 +138,7 @@ const SchedulePicker = ({
                 Delivery Date
               </CardTitle>
               <CardDescription>
-                When should we return your clean clothes?
+                When should we return your clean clothes? (Thursdays & Saturdays only)
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -149,7 +164,7 @@ const SchedulePicker = ({
                       setDeliveryDate(date);
                       setDeliveryOpen(false);
                     }}
-                    disabled={(date) => date < minDeliveryDate}
+                    disabled={isDeliveryDateDisabled}
                     initialFocus
                     className="pointer-events-auto"
                   />
@@ -195,15 +210,15 @@ const SchedulePicker = ({
               <div className="flex items-start space-x-2">
                 <div className="w-2 h-2 bg-green-600 rounded-full mt-2"></div>
                 <div>
-                  <div className="font-semibold">Processing Time</div>
-                  <div className="text-gray-600">48-72 hours turnaround</div>
+                  <div className="font-semibold">Service Days</div>
+                  <div className="text-gray-600">Thursdays & Saturdays only</div>
                 </div>
               </div>
               <div className="flex items-start space-x-2">
                 <div className="w-2 h-2 bg-purple-600 rounded-full mt-2"></div>
                 <div>
                   <div className="font-semibold">Service Hours</div>
-                  <div className="text-gray-600">9:00 AM - 7:00 PM daily</div>
+                  <div className="text-gray-600">9:00 AM - 7:00 PM</div>
                 </div>
               </div>
             </div>
