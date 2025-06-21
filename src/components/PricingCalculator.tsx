@@ -22,8 +22,9 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
   const [uploadedFile, setUploadedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [pendingBookingData, setPendingBookingData] = useState(null);
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, session } = useAuth();
 
   // Calculate total using the same logic as ClothingSelector
   const totalAmount = selectedClothes.reduce((total, item) => {
@@ -32,6 +33,8 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
 
   console.log('PricingCalculator - Selected clothes:', selectedClothes);
   console.log('PricingCalculator - Total amount:', totalAmount);
+  console.log('PricingCalculator - Current user:', user);
+  console.log('PricingCalculator - Current session:', session);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -61,6 +64,59 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
     window.open(whatsappUrl, '_blank');
   };
 
+  const saveBookingToDatabase = async (userId) => {
+    try {
+      console.log('Attempting to save booking with userId:', userId);
+      const bookingData = {
+        user_id: userId,
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        customer_address: customerAddress,
+        selected_clothes: selectedClothes,
+        pickup_date: pickupDate,
+        delivery_date: deliveryDate,
+        pickup_time_slot: pickupTimeSlot,
+        delivery_time_slot: deliveryTimeSlot,
+        total_amount: totalAmount,
+        payment_status: uploadedFile ? 'pending' : 'pending'
+      };
+
+      console.log('Booking data to save:', bookingData);
+
+      const { data, error } = await supabase
+        .from('bookings')
+        .insert(bookingData)
+        .select();
+
+      if (error) {
+        console.error('Supabase booking error:', error);
+        throw error;
+      }
+
+      console.log('Booking saved successfully:', data);
+      
+      toast({
+        title: "Booking Confirmed!",
+        description: "Your laundry booking has been submitted successfully. We'll contact you soon!",
+      });
+
+      // Clear the form
+      setCustomerName('');
+      setCustomerPhone('');
+      setCustomerAddress('');
+      setCustomerEmail('');
+      setCustomerPassword('');
+      setUploadedFile(null);
+      setPendingBookingData(null);
+      setShowPaymentModal(false);
+
+      return data;
+    } catch (error) {
+      console.error('Error saving booking:', error);
+      throw error;
+    }
+  };
+
   const handleSignUp = async () => {
     if (!customerEmail || !customerPassword || !customerName) {
       toast({
@@ -71,11 +127,35 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
       return;
     }
 
+    if (customerPassword.length < 6) {
+      toast({
+        title: "Password Too Short",
+        description: "Password must be at least 6 characters long",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
+      // Store booking data for after authentication
+      const bookingData = {
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        customer_address: customerAddress,
+        selected_clothes: selectedClothes,
+        pickup_date: pickupDate,
+        delivery_date: deliveryDate,
+        pickup_time_slot: pickupTimeSlot,
+        delivery_time_slot: deliveryTimeSlot,
+        total_amount: totalAmount
+      };
+      setPendingBookingData(bookingData);
+
       const redirectUrl = `${window.location.origin}/`;
       
-      const { error } = await supabase.auth.signUp({
+      // Try to sign up the user
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email: customerEmail,
         password: customerPassword,
         options: {
@@ -86,20 +166,83 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
         }
       });
       
-      if (error) throw error;
+      if (signUpError) {
+        console.error('Sign up error:', signUpError);
+        
+        // Check if user already exists
+        if (signUpError.message.includes('already') || signUpError.message.includes('exists')) {
+          toast({
+            title: "Account Already Exists",
+            description: "Please try signing in with your existing account",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        throw signUpError;
+      }
+
+      console.log('Sign up successful:', signUpData);
+
+      // If sign up was successful and user is immediately available
+      if (signUpData.user && signUpData.session) {
+        console.log('User is immediately authenticated, saving booking...');
+        await saveBookingToDatabase(signUpData.user.id);
+      } else {
+        // User needs to confirm email
+        toast({
+          title: "Account Created!",
+          description: "Please check your email to verify your account, then complete your booking.",
+        });
+        setShowAuthModal(false);
+        setShowPaymentModal(true);
+      }
       
-      toast({
-        title: "Account created!",
-        description: "Please check your email to verify your account. You can continue with your booking.",
-      });
-      
-      setShowAuthModal(false);
-      setShowPaymentModal(true);
     } catch (error) {
       console.error('Sign up error:', error);
       toast({
         title: "Authentication Error",
-        description: error.message,
+        description: error.message || "Failed to create account. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignIn = async () => {
+    if (!customerEmail || !customerPassword) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in email and password",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: customerEmail,
+        password: customerPassword,
+      });
+
+      if (error) {
+        console.error('Sign in error:', error);
+        throw error;
+      }
+
+      console.log('Sign in successful:', data);
+      
+      if (data.user) {
+        await saveBookingToDatabase(data.user.id);
+      }
+
+    } catch (error) {
+      console.error('Sign in error:', error);
+      toast({
+        title: "Sign In Error",
+        description: error.message || "Failed to sign in. Please check your credentials.",
         variant: "destructive",
       });
     } finally {
@@ -117,63 +260,34 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
       return;
     }
 
-    // If user is not authenticated, show auth modal first
-    if (!user) {
+    // Check if user is already authenticated
+    if (user && session) {
+      console.log('User is already authenticated, proceeding to payment...');
+      setShowPaymentModal(true);
+      return;
+    }
+
+    // If user is not authenticated, show auth modal
+    console.log('User not authenticated, showing auth modal...');
+    setShowAuthModal(true);
+  };
+
+  const handleConfirmPayment = async () => {
+    // Check if user is authenticated
+    if (!user || !session) {
+      toast({
+        title: "Not Authenticated",
+        description: "Please sign in or create an account to complete your booking.",
+        variant: "destructive",
+      });
+      setShowPaymentModal(false);
       setShowAuthModal(true);
       return;
     }
 
-    setShowPaymentModal(true);
-  };
-
-  const handleConfirmPayment = async () => {
     setLoading(true);
-
     try {
-      console.log('Attempting to save booking with user:', user);
-      console.log('Booking data:', {
-        user_id: user?.id,
-        customer_name: customerName,
-        customer_phone: customerPhone,
-        customer_address: customerAddress,
-        selected_clothes: selectedClothes,
-        pickup_date: pickupDate,
-        delivery_date: deliveryDate,
-        pickup_time_slot: pickupTimeSlot,
-        delivery_time_slot: deliveryTimeSlot,
-        total_amount: totalAmount
-      });
-
-      const { data, error } = await supabase
-        .from('bookings')
-        .insert({
-          user_id: user.id,
-          customer_name: customerName,
-          customer_phone: customerPhone,
-          customer_address: customerAddress,
-          selected_clothes: selectedClothes,
-          pickup_date: pickupDate,
-          delivery_date: deliveryDate,
-          pickup_time_slot: pickupTimeSlot,
-          delivery_time_slot: deliveryTimeSlot,
-          total_amount: totalAmount,
-          payment_status: uploadedFile ? 'pending' : 'pending'
-        })
-        .select();
-
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
-
-      console.log('Booking saved successfully:', data);
-
-      toast({
-        title: "Booking Confirmed!",
-        description: "Your laundry booking has been submitted successfully. We'll contact you soon!",
-      });
-
-      setShowPaymentModal(false);
+      await saveBookingToDatabase(user.id);
     } catch (error) {
       console.error('Error submitting booking:', error);
       toast({
@@ -294,9 +408,9 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
         <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Create Account</DialogTitle>
+              <DialogTitle>Create Account or Sign In</DialogTitle>
               <DialogDescription>
-                Create an account to complete your booking
+                Create an account or sign in to complete your booking
               </DialogDescription>
             </DialogHeader>
             
@@ -320,22 +434,34 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
                   type="password"
                   value={customerPassword}
                   onChange={(e) => setCustomerPassword(e.target.value)}
-                  placeholder="Create a password (min 6 characters)"
+                  placeholder="Enter password (min 6 characters)"
                   required
                   minLength={6}
                 />
               </div>
 
-              <Button 
-                onClick={handleSignUp}
-                disabled={loading}
-                className="w-full"
-              >
-                {loading ? 'Creating Account...' : 'Create Account & Continue'}
-              </Button>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={handleSignUp}
+                  disabled={loading}
+                  className="flex-1"
+                  variant="default"
+                >
+                  {loading ? 'Creating...' : 'Create Account'}
+                </Button>
+                
+                <Button 
+                  onClick={handleSignIn}
+                  disabled={loading}
+                  className="flex-1"
+                  variant="outline"
+                >
+                  {loading ? 'Signing In...' : 'Sign In'}
+                </Button>
+              </div>
 
               <p className="text-xs text-gray-500 text-center">
-                By creating an account, you can track your orders and get faster service
+                New customers can create an account, existing customers can sign in
               </p>
             </div>
           </DialogContent>
@@ -403,10 +529,10 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
               <div className="flex gap-3">
                 <Button
                   onClick={handleConfirmPayment}
-                  disabled={loading}
+                  disabled={loading || !user}
                   className="flex-1"
                 >
-                  {loading ? 'Processing...' : 'Confirm Payment'}
+                  {loading ? 'Processing...' : `Confirm Payment - ₦${totalAmount.toLocaleString()}`}
                 </Button>
                 
                 <Button
@@ -418,6 +544,12 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
                   WhatsApp
                 </Button>
               </div>
+
+              {!user && (
+                <p className="text-xs text-red-500 text-center">
+                  Please sign in or create an account to complete payment
+                </p>
+              )}
 
               <p className="text-xs text-gray-500 text-center">
                 If you don't have a receipt, click WhatsApp to contact us for payment confirmation
