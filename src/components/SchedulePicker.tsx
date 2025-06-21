@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { ArrowLeft, ArrowRight, Calendar as CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,10 @@ interface SchedulePickerProps {
   setPickupDate: (date: Date | null) => void;
   deliveryDate: Date | null;
   setDeliveryDate: (date: Date | null) => void;
+  pickupTimeSlot: string | null;
+  setPickupTimeSlot: (slot: string | null) => void;
+  deliveryTimeSlot: string | null;
+  setDeliveryTimeSlot: (slot: string | null) => void;
   onNext: () => void;
   onBack: () => void;
 }
@@ -20,7 +25,11 @@ const SchedulePicker = ({
   pickupDate, 
   setPickupDate, 
   deliveryDate, 
-  setDeliveryDate, 
+  setDeliveryDate,
+  pickupTimeSlot,
+  setPickupTimeSlot,
+  deliveryTimeSlot,
+  setDeliveryTimeSlot,
   onNext, 
   onBack 
 }: SchedulePickerProps) => {
@@ -41,20 +50,20 @@ const SchedulePicker = ({
 
   const minDeliveryDate = pickupDate ? new Date(pickupDate.getTime() + 2 * 24 * 60 * 60 * 1000) : tomorrow;
 
-  // Function to check if a date is Thursday (4) or Saturday (6)
-  const isThursdayOrSaturday = (date: Date) => {
+  // Function to check if a date is Tuesday (2) or Saturday (6)
+  const isTuesdayOrSaturday = (date: Date) => {
     const day = date.getDay();
-    return day === 4 || day === 6; // 4 = Thursday, 6 = Saturday
+    return day === 2 || day === 6; // 2 = Tuesday, 6 = Saturday
   };
 
-  // Disable dates that are not Thursday or Saturday, or are before tomorrow
+  // Disable dates that are not Tuesday or Saturday, or are before tomorrow
   const isPickupDateDisabled = (date: Date) => {
-    return date < tomorrow || !isThursdayOrSaturday(date);
+    return date < tomorrow || !isTuesdayOrSaturday(date);
   };
 
-  // Disable dates that are not Thursday or Saturday, or are before minimum delivery date
+  // Disable dates that are not Tuesday or Saturday, or are before minimum delivery date
   const isDeliveryDateDisabled = (date: Date) => {
-    return date < minDeliveryDate || !isThursdayOrSaturday(date);
+    return date < minDeliveryDate || !isTuesdayOrSaturday(date);
   };
 
   return (
@@ -66,7 +75,7 @@ const SchedulePicker = ({
             Back to Clothes
           </Button>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Schedule Pickup & Delivery</h1>
-          <p className="text-gray-600">Choose your preferred pickup and delivery dates. We provide 48-72 hour service on Thursdays and Saturdays only.</p>
+          <p className="text-gray-600">Choose your preferred pickup and delivery dates. We provide 48-72 hour service on Tuesdays and Saturdays only.</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
@@ -78,7 +87,7 @@ const SchedulePicker = ({
                 Pickup Date
               </CardTitle>
               <CardDescription>
-                When should we collect your clothes? (Thursdays & Saturdays only)
+                When should we collect your clothes? (Tuesdays & Saturdays only)
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -112,15 +121,17 @@ const SchedulePicker = ({
 
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Preferred Time Slot
+                  Preferred Time Slot *
                 </label>
                 <div className="grid grid-cols-1 gap-2">
                   {timeSlots.map((slot) => (
                     <Button
                       key={slot}
-                      variant="outline"
+                      variant={pickupTimeSlot === slot ? "default" : "outline"}
                       className="justify-start text-sm"
                       size="sm"
+                      onClick={() => setPickupTimeSlot(slot)}
+                      disabled={!pickupDate}
                     >
                       {slot}
                     </Button>
@@ -138,7 +149,7 @@ const SchedulePicker = ({
                 Delivery Date
               </CardTitle>
               <CardDescription>
-                When should we return your clean clothes? (Thursdays & Saturdays only)
+                When should we return your clean clothes? (Tuesdays & Saturdays only)
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -173,15 +184,16 @@ const SchedulePicker = ({
 
               <div>
                 <label className="text-sm font-medium text-gray-700 mb-2 block">
-                  Preferred Time Slot
+                  Preferred Time Slot *
                 </label>
                 <div className="grid grid-cols-1 gap-2">
                   {timeSlots.map((slot) => (
                     <Button
                       key={slot}
-                      variant="outline"
+                      variant={deliveryTimeSlot === slot ? "default" : "outline"}
                       className="justify-start text-sm"
                       size="sm"
+                      onClick={() => setDeliveryTimeSlot(slot)}
                       disabled={!deliveryDate}
                     >
                       {slot}
@@ -211,7 +223,7 @@ const SchedulePicker = ({
                 <div className="w-2 h-2 bg-green-600 rounded-full mt-2"></div>
                 <div>
                   <div className="font-semibold">Service Days</div>
-                  <div className="text-gray-600">Thursdays & Saturdays only</div>
+                  <div className="text-gray-600">Tuesdays & Saturdays only</div>
                 </div>
               </div>
               <div className="flex items-start space-x-2">
@@ -228,7 +240,7 @@ const SchedulePicker = ({
         <div className="mt-8 flex justify-end">
           <Button 
             onClick={onNext}
-            disabled={!pickupDate || !deliveryDate}
+            disabled={!pickupDate || !deliveryDate || !pickupTimeSlot || !deliveryTimeSlot}
             className="px-8"
           >
             Continue to Pricing

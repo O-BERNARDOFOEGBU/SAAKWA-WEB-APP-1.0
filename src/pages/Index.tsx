@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Calendar, MapPin, Star, Users, Clock, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,8 @@ const Index = () => {
   const [selectedClothes, setSelectedClothes] = useState([]);
   const [pickupDate, setPickupDate] = useState(null);
   const [deliveryDate, setDeliveryDate] = useState(null);
+  const [pickupTimeSlot, setPickupTimeSlot] = useState(null);
+  const [deliveryTimeSlot, setDeliveryTimeSlot] = useState(null);
 
   const renderStep = () => {
     switch (currentStep) {
@@ -31,6 +34,10 @@ const Index = () => {
             setPickupDate={setPickupDate}
             deliveryDate={deliveryDate}
             setDeliveryDate={setDeliveryDate}
+            pickupTimeSlot={pickupTimeSlot}
+            setPickupTimeSlot={setPickupTimeSlot}
+            deliveryTimeSlot={deliveryTimeSlot}
+            setDeliveryTimeSlot={setDeliveryTimeSlot}
             onNext={() => setCurrentStep('pricing')}
             onBack={() => setCurrentStep('clothes')}
           />
@@ -41,6 +48,8 @@ const Index = () => {
             selectedClothes={selectedClothes}
             pickupDate={pickupDate}
             deliveryDate={deliveryDate}
+            pickupTimeSlot={pickupTimeSlot}
+            deliveryTimeSlot={deliveryTimeSlot}
             onBack={() => setCurrentStep('schedule')}
           />
         );

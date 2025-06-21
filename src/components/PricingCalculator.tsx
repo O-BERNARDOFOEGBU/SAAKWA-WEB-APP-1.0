@@ -12,7 +12,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ArrowLeft, MessageCircle, Upload, Copy, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, onBack }) => {
+const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTimeSlot, deliveryTimeSlot, onBack }) => {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
@@ -160,6 +160,8 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, onBack }
           selected_clothes: selectedClothes,
           pickup_date: pickupDate,
           delivery_date: deliveryDate,
+          pickup_time_slot: pickupTimeSlot,
+          delivery_time_slot: deliveryTimeSlot,
           total_amount: totalAmount,
           payment_status: uploadedFile ? 'pending' : 'pending'
         });
@@ -174,6 +176,7 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, onBack }
       setShowPaymentModal(false);
       // Reset form or redirect
     } catch (error) {
+      console.error('Error submitting booking:', error);
       toast({
         title: "Error",
         description: "Failed to submit booking. Please try again.",
@@ -254,6 +257,23 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, onBack }
                   </div>
                 ))}
               </div>
+              
+              {/* Schedule Summary */}
+              <div className="mt-4 pt-3 border-t space-y-2 text-sm">
+                {pickupDate && (
+                  <div className="flex justify-between">
+                    <span>Pickup:</span>
+                    <span>{new Date(pickupDate).toLocaleDateString()} {pickupTimeSlot && `at ${pickupTimeSlot}`}</span>
+                  </div>
+                )}
+                {deliveryDate && (
+                  <div className="flex justify-between">
+                    <span>Delivery:</span>
+                    <span>{new Date(deliveryDate).toLocaleDateString()} {deliveryTimeSlot && `at ${deliveryTimeSlot}`}</span>
+                  </div>
+                )}
+              </div>
+
               <div className="font-semibold text-lg text-right mt-4 pt-3 border-t">
                 Total: ₦{totalAmount.toLocaleString()}
               </div>
@@ -262,7 +282,7 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, onBack }
                 <Button 
                   onClick={handleCompleteBooking} 
                   className="w-full bg-blue-600 hover:bg-blue-700"
-                  disabled={!customerName || !customerPhone || !customerAddress}
+                  disabled={!customerName || !customerPhone || !customerAddress || totalAmount === 0}
                 >
                   Complete Booking - ₦{totalAmount.toLocaleString()}
                 </Button>
