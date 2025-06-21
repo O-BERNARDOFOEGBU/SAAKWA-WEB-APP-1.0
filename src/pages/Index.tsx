@@ -7,6 +7,8 @@ import ClothingSelector from '@/components/ClothingSelector';
 import SchedulePicker from '@/components/SchedulePicker';
 import ServiceArea from '@/components/ServiceArea';
 import PricingCalculator from '@/components/PricingCalculator';
+import AuthGuard from '@/components/auth/AuthGuard';
+import Header from '@/components/Header';
 
 const Index = () => {
   const [currentStep, setCurrentStep] = useState('home');
@@ -220,7 +222,12 @@ const Index = () => {
     }
   };
 
-  return renderStep();
+  return (
+    <AuthGuard>
+      <Header />
+      {renderStep()}
+    </AuthGuard>
+  );
 };
 
 export default Index;
