@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,17 +10,22 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { ArrowLeft, MessageCircle, Upload, Copy, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, onBack }) => {
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+  const [customerPassword, setCustomerPassword] = useState('');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const clothingPrices = {
     "T-Shirt": 200,
@@ -76,6 +82,51 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, onBack }
     window.open(whatsappUrl, '_blank');
   };
 
+  const handleSignUp = async () => {
+    if (!customerEmail || !customerPassword || !customerName) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in email, password, and full name",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const redirectUrl = `${window.location.origin}/`;
+      
+      const { error } = await supabase.auth.signUp({
+        email: customerEmail,
+        password: customerPassword,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            full_name: customerName
+          }
+        }
+      });
+      
+      if (error) throw error;
+      
+      toast({
+        title: "Account created!",
+        description: "Please check your email to verify your account. You can continue with your booking.",
+      });
+      
+      setShowAuthModal(false);
+      setShowPaymentModal(true);
+    } catch (error) {
+      toast({
+        title: "Authentication Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleCompleteBooking = async () => {
     if (!customerName || !customerPhone || !customerAddress) {
       toast({
@@ -83,6 +134,12 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, onBack }
         description: "Please fill in all required fields",
         variant: "destructive",
       });
+      return;
+    }
+
+    // If user is not authenticated, show auth modal first
+    if (!user) {
+      setShowAuthModal(true);
       return;
     }
 
@@ -189,17 +246,15 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, onBack }
               <CardTitle>Order Summary</CardTitle>
             </CardHeader>
             <CardContent>
-              <ul>
+              <div className="space-y-3">
                 {selectedClothes.map((item, index) => (
-                  <li key={index} className="py-2 border-b">
-                    <div className="flex justify-between">
-                      <span>{item.quantity} x {item.type}</span>
-                      <span>₦{(clothingPrices[item.type] || 0) * item.quantity}</span>
-                    </div>
-                  </li>
+                  <div key={index} className="flex justify-between py-2 border-b">
+                    <span>{item.quantity} x {item.type}</span>
+                    <span>₦{((clothingPrices[item.type] || 0) * item.quantity).toLocaleString()}</span>
+                  </div>
                 ))}
-              </ul>
-              <div className="font-semibold text-right mt-4">
+              </div>
+              <div className="font-semibold text-lg text-right mt-4 pt-3 border-t">
                 Total: ₦{totalAmount.toLocaleString()}
               </div>
               
@@ -215,6 +270,57 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, onBack }
             </CardContent>
           </Card>
         </div>
+
+        {/* Auth Modal */}
+        <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Create Account</DialogTitle>
+              <DialogDescription>
+                Create an account to complete your booking
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="email">Email *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={customerEmail}
+                  onChange={(e) => setCustomerEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="password">Password *</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={customerPassword}
+                  onChange={(e) => setCustomerPassword(e.target.value)}
+                  placeholder="Create a password (min 6 characters)"
+                  required
+                  minLength={6}
+                />
+              </div>
+
+              <Button 
+                onClick={handleSignUp}
+                disabled={loading}
+                className="w-full"
+              >
+                {loading ? 'Creating Account...' : 'Create Account & Continue'}
+              </Button>
+
+              <p className="text-xs text-gray-500 text-center">
+                By creating an account, you can track your orders and get faster service
+              </p>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         {/* Payment Modal */}
         <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>

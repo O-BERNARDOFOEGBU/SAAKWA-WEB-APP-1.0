@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Calendar, MapPin, Star, Users, Clock, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,8 +6,6 @@ import ClothingSelector from '@/components/ClothingSelector';
 import SchedulePicker from '@/components/SchedulePicker';
 import ServiceArea from '@/components/ServiceArea';
 import PricingCalculator from '@/components/PricingCalculator';
-import AuthGuard from '@/components/auth/AuthGuard';
-import Header from '@/components/Header';
 
 const Index = () => {
   const [currentStep, setCurrentStep] = useState('home');
@@ -222,12 +219,7 @@ const Index = () => {
     }
   };
 
-  return (
-    <AuthGuard>
-      <Header />
-      {renderStep()}
-    </AuthGuard>
-  );
+  return renderStep();
 };
 
 export default Index;
