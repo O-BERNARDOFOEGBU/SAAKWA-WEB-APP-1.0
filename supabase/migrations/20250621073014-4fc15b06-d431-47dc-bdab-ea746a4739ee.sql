@@ -19,6 +19,7 @@ CREATE TABLE public.bookings (
   selected_clothes jsonb NOT NULL,
   pickup_date date NOT NULL,
   delivery_date date NOT NULL,
+  delivery_time_slot text NOT NULL,
   total_amount decimal(10,2) NOT NULL,
   payment_status text DEFAULT 'pending' CHECK (payment_status IN ('pending', 'confirmed', 'failed')),
   receipt_url text,
