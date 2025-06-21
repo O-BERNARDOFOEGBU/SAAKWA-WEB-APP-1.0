@@ -9,8 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { ArrowLeft, MessageCircle, Upload, Copy, Check } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, MessageCircle, Copy, Check } from 'lucide-react';
 
 const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTimeSlot, deliveryTimeSlot, onBack }) => {
   const [customerName, setCustomerName] = useState('');
@@ -25,34 +24,14 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
-  const navigate = useNavigate();
 
-  const clothingPrices = {
-    "T-Shirt": 200,
-    "Shirt": 300,
-    "Trouser": 400,
-    "Jeans": 500,
-    "Short": 150,
-    "Dress": 600,
-    "Skirt": 350,
-    "Blouse": 350,
-    "Jacket": 700,
-    "Sweater": 550,
-    "Coat": 800,
-    "Suit": 1000,
-    "Tie": 100,
-    "Scarf": 150,
-    "Socks": 50,
-    "Underwear": 100,
-    "Bedding": 750,
-    "Curtain": 900,
-    "Towel": 200,
-    "Table Cloth": 300,
-  };
-
+  // Calculate total using the same logic as ClothingSelector
   const totalAmount = selectedClothes.reduce((total, item) => {
-    return total + (clothingPrices[item.type] || 0) * item.quantity;
+    return total + (item.price * item.quantity);
   }, 0);
+
+  console.log('PricingCalculator - Selected clothes:', selectedClothes);
+  console.log('PricingCalculator - Total amount:', totalAmount);
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
@@ -77,7 +56,7 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
 
   const openWhatsApp = () => {
     const message = `Hi! I need help confirming my payment for Saakwa Laundry booking. Total amount: ₦${totalAmount.toLocaleString()}`;
-    const phoneNumber = "2348123456789"; // Replace with actual WhatsApp number
+    const phoneNumber = "2348123456789";
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
   };
@@ -117,6 +96,7 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
       setShowAuthModal(false);
       setShowPaymentModal(true);
     } catch (error) {
+      console.error('Sign up error:', error);
       toast({
         title: "Authentication Error",
         description: error.message,
@@ -150,7 +130,21 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
     setLoading(true);
 
     try {
-      const { error } = await supabase
+      console.log('Attempting to save booking with user:', user);
+      console.log('Booking data:', {
+        user_id: user?.id,
+        customer_name: customerName,
+        customer_phone: customerPhone,
+        customer_address: customerAddress,
+        selected_clothes: selectedClothes,
+        pickup_date: pickupDate,
+        delivery_date: deliveryDate,
+        pickup_time_slot: pickupTimeSlot,
+        delivery_time_slot: deliveryTimeSlot,
+        total_amount: totalAmount
+      });
+
+      const { data, error } = await supabase
         .from('bookings')
         .insert({
           user_id: user.id,
@@ -164,9 +158,15 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
           delivery_time_slot: deliveryTimeSlot,
           total_amount: totalAmount,
           payment_status: uploadedFile ? 'pending' : 'pending'
-        });
+        })
+        .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+
+      console.log('Booking saved successfully:', data);
 
       toast({
         title: "Booking Confirmed!",
@@ -174,12 +174,11 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
       });
 
       setShowPaymentModal(false);
-      // Reset form or redirect
     } catch (error) {
       console.error('Error submitting booking:', error);
       toast({
         title: "Error",
-        description: "Failed to submit booking. Please try again.",
+        description: `Failed to submit booking: ${error.message}`,
         variant: "destructive",
       });
     } finally {
@@ -252,8 +251,8 @@ const PricingCalculator = ({ selectedClothes, pickupDate, deliveryDate, pickupTi
               <div className="space-y-3">
                 {selectedClothes.map((item, index) => (
                   <div key={index} className="flex justify-between py-2 border-b">
-                    <span>{item.quantity} x {item.type}</span>
-                    <span>₦{((clothingPrices[item.type] || 0) * item.quantity).toLocaleString()}</span>
+                    <span>{item.quantity} x {item.name}</span>
+                    <span>₦{(item.price * item.quantity).toLocaleString()}</span>
                   </div>
                 ))}
               </div>

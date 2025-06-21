@@ -125,6 +125,9 @@ const ClothingSelector = ({ selectedClothes, setSelectedClothes, onNext, onBack 
   const totalItems = selectedClothes.reduce((sum, item) => sum + item.quantity, 0);
   const totalCost = selectedClothes.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
+  console.log('ClothingSelector - Selected clothes:', selectedClothes);
+  console.log('ClothingSelector - Total cost:', totalCost);
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
@@ -225,7 +228,7 @@ const ClothingSelector = ({ selectedClothes, setSelectedClothes, onNext, onBack 
                   onClick={onNext}
                   disabled={selectedClothes.length === 0}
                 >
-                  Continue to Schedule
+                  Continue to Schedule - ₦{totalCost.toLocaleString()}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </CardContent>
