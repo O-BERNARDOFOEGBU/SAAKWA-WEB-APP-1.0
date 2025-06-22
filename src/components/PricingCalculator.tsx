@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,14 +28,11 @@ const PricingCalculator = ({
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
-  const [customerEmail, setCustomerEmail] = useState("");
-  const [customerPassword, setCustomerPassword] = useState("");
   const [showPaymentModal, setShowPaymentModal] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const [uploadedFile, setUploadedFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [pendingBookingData, setPendingBookingData] = useState(null);
   const { toast } = useToast();
   const { user, session } = useAuth();
 
@@ -58,14 +56,49 @@ const PricingCalculator = ({
     });
   };
 
-  const handleFileUpload = (event) => {
+  const handleFileUpload = async (event) => {
     const file = event.target.files[0];
-    if (file) {
-      setUploadedFile(file);
+    if (!file) return;
+
+    if (!user) {
+      toast({
+        title: "Not Authenticated",
+        description: "Please sign in to upload receipts",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+      const { data, error } = await supabase.storage
+        .from('receipts')
+        .upload(fileName, file);
+
+      if (error) throw error;
+
+      setUploadedFile({
+        name: file.name,
+        path: data.path,
+        url: data.path
+      });
+
       toast({
         title: "Receipt uploaded",
         description: "Your payment receipt has been uploaded successfully",
       });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload receipt. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -93,6 +126,7 @@ const PricingCalculator = ({
         delivery_time_slot: deliveryTimeSlot,
         total_amount: totalAmount,
         payment_status: uploadedFile ? "pending" : "pending",
+        receipt_url: uploadedFile ? uploadedFile.path : null,
       };
 
       console.log("Booking data to save:", bookingData);
@@ -119,154 +153,13 @@ const PricingCalculator = ({
       setCustomerName("");
       setCustomerPhone("");
       setCustomerAddress("");
-      setCustomerEmail("");
-      setCustomerPassword("");
       setUploadedFile(null);
-      setPendingBookingData(null);
       setShowPaymentModal(false);
 
       return data;
     } catch (error) {
       console.error("Error saving booking:", error);
       throw error;
-    }
-  };
-
-  const handleSignUp = async () => {
-    if (!customerEmail || !customerPassword || !customerName) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in email, password, and full name",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (customerPassword.length < 6) {
-      toast({
-        title: "Password Too Short",
-        description: "Password must be at least 6 characters long",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // Store booking data for after authentication
-      const bookingData = {
-        customer_name: customerName,
-        customer_phone: customerPhone,
-        customer_address: customerAddress,
-        selected_clothes: selectedClothes,
-        pickup_date: pickupDate,
-        delivery_date: deliveryDate,
-        pickup_time_slot: pickupTimeSlot,
-        delivery_time_slot: deliveryTimeSlot,
-        total_amount: totalAmount,
-      };
-      setPendingBookingData(bookingData);
-
-      const redirectUrl = `${window.location.origin}/`;
-
-      // Try to sign up the user
-      const { data: signUpData, error: signUpError } =
-        await supabase.auth.signUp({
-          email: customerEmail,
-          password: customerPassword,
-          options: {
-            emailRedirectTo: redirectUrl,
-            data: {
-              full_name: customerName,
-            },
-          },
-        });
-
-      if (signUpError) {
-        console.error("Sign up error:", signUpError);
-
-        // Check if user already exists
-        if (
-          signUpError.message.includes("already") ||
-          signUpError.message.includes("exists")
-        ) {
-          toast({
-            title: "Account Already Exists",
-            description: "Please try signing in with your existing account",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        throw signUpError;
-      }
-
-      console.log("Sign up successful:", signUpData);
-
-      // If sign up was successful and user is immediately available
-      if (signUpData.user && signUpData.session) {
-        console.log("User is immediately authenticated, saving booking...");
-        await saveBookingToDatabase(signUpData.user.id);
-      } else {
-        // User needs to confirm email
-        toast({
-          title: "Account Created!",
-          description:
-            "Please check your email to verify your account, then complete your booking.",
-        });
-        setShowAuthModal(false);
-        setShowPaymentModal(true);
-      }
-    } catch (error) {
-      console.error("Sign up error:", error);
-      toast({
-        title: "Authentication Error",
-        description:
-          error.message || "Failed to create account. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignIn = async () => {
-    if (!customerEmail || !customerPassword) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in email and password",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: customerEmail,
-        password: customerPassword,
-      });
-
-      if (error) {
-        console.error("Sign in error:", error);
-        throw error;
-      }
-
-      console.log("Sign in successful:", data);
-
-      if (data.user) {
-        await saveBookingToDatabase(data.user.id);
-      }
-    } catch (error) {
-      console.error("Sign in error:", error);
-      toast({
-        title: "Sign In Error",
-        description:
-          error.message || "Failed to sign in. Please check your credentials.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -281,28 +174,28 @@ const PricingCalculator = ({
     }
 
     // Check if user is already authenticated
-    if (user && session) {
-      console.log("User is already authenticated, proceeding to payment...");
-      setShowPaymentModal(true);
+    if (!user || !session) {
+      toast({
+        title: "Please Sign In",
+        description: "You need to sign in or create an account to complete your booking.",
+        variant: "destructive",
+      });
       return;
     }
 
-    // If user is not authenticated, show auth modal
-    console.log("User not authenticated, showing auth modal...");
-    setShowAuthModal(true);
+    console.log("User is authenticated, proceeding to payment...");
+    setShowPaymentModal(true);
   };
 
   const handleConfirmPayment = async () => {
-    // Check if user is authenticated
+    // Double-check authentication
     if (!user || !session) {
       toast({
         title: "Not Authenticated",
-        description:
-          "Please sign in or create an account to complete your booking.",
+        description: "Please sign in to complete your booking.",
         variant: "destructive",
       });
       setShowPaymentModal(false);
-      setShowAuthModal(true);
       return;
     }
 
@@ -433,79 +326,16 @@ const PricingCalculator = ({
                     !customerName ||
                     !customerPhone ||
                     !customerAddress ||
-                    totalAmount === 0
+                    totalAmount === 0 ||
+                    !user
                   }
                 >
-                  Complete Booking - ₦{totalAmount.toLocaleString()}
+                  {!user ? "Please Sign In First" : `Complete Booking - ₦${totalAmount.toLocaleString()}`}
                 </Button>
               </div>
             </CardContent>
           </Card>
         </div>
-
-        {/* Auth Modal */}
-        <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Create Account or Sign In</DialogTitle>
-              <DialogDescription>
-                Create an account or sign in to complete your booking
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={customerEmail}
-                  onChange={(e) => setCustomerEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="password">Password *</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={customerPassword}
-                  onChange={(e) => setCustomerPassword(e.target.value)}
-                  placeholder="Enter password (min 6 characters)"
-                  required
-                  minLength={6}
-                />
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  onClick={handleSignUp}
-                  disabled={loading}
-                  className="flex-1"
-                  variant="default"
-                >
-                  {loading ? "Creating..." : "Create Account"}
-                </Button>
-
-                <Button
-                  onClick={handleSignIn}
-                  disabled={loading}
-                  className="flex-1"
-                  variant="outline"
-                >
-                  {loading ? "Signing In..." : "Sign In"}
-                </Button>
-              </div>
-
-              <p className="text-xs text-gray-500 text-center">
-                New customers can create an account, existing customers can sign
-                in
-              </p>
-            </div>
-          </DialogContent>
-        </Dialog>
 
         {/* Payment Modal */}
         <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
@@ -565,7 +395,13 @@ const PricingCalculator = ({
                   accept="image/*,.pdf"
                   onChange={handleFileUpload}
                   className="mt-1"
+                  disabled={uploading || !user}
                 />
+                {uploading && (
+                  <p className="text-sm text-blue-600 mt-1">
+                    Uploading...
+                  </p>
+                )}
                 {uploadedFile && (
                   <p className="text-sm text-green-600 mt-1">
                     ✓ {uploadedFile.name} uploaded
@@ -596,7 +432,7 @@ const PricingCalculator = ({
 
               {!user && (
                 <p className="text-xs text-red-500 text-center">
-                  Please sign in or create an account to complete payment
+                  Please sign in to complete payment
                 </p>
               )}
 

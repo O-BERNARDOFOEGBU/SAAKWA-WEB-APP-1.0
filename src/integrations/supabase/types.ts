@@ -16,9 +16,11 @@ export type Database = {
           customer_name: string
           customer_phone: string
           delivery_date: string
+          delivery_time_slot: string | null
           id: string
           payment_status: string | null
           pickup_date: string
+          pickup_time_slot: string | null
           receipt_url: string | null
           selected_clothes: Json
           total_amount: number
@@ -31,9 +33,11 @@ export type Database = {
           customer_name: string
           customer_phone: string
           delivery_date: string
+          delivery_time_slot?: string | null
           id?: string
           payment_status?: string | null
           pickup_date: string
+          pickup_time_slot?: string | null
           receipt_url?: string | null
           selected_clothes: Json
           total_amount: number
@@ -46,9 +50,11 @@ export type Database = {
           customer_name?: string
           customer_phone?: string
           delivery_date?: string
+          delivery_time_slot?: string | null
           id?: string
           payment_status?: string | null
           pickup_date?: string
+          pickup_time_slot?: string | null
           receipt_url?: string | null
           selected_clothes?: Json
           total_amount?: number

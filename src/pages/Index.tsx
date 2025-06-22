@@ -3,6 +3,9 @@ import { useState } from 'react';
 import { Calendar, MapPin, Star, Users, Clock, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import Header from '@/components/Header';
 import ClothingSelector from '@/components/ClothingSelector';
 import SchedulePicker from '@/components/SchedulePicker';
 import ServiceArea from '@/components/ServiceArea';
@@ -15,6 +18,20 @@ const Index = () => {
   const [deliveryDate, setDeliveryDate] = useState(null);
   const [pickupTimeSlot, setPickupTimeSlot] = useState(null);
   const [deliveryTimeSlot, setDeliveryTimeSlot] = useState(null);
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const handleBookingStart = () => {
+    if (!user) {
+      toast({
+        title: "Please Sign In",
+        description: "You need to sign in or create an account to book our services.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setCurrentStep('clothes');
+  };
 
   const renderStep = () => {
     switch (currentStep) {
@@ -58,6 +75,8 @@ const Index = () => {
       default:
         return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+            <Header />
+            
             {/* Hero Section */}
             <div className="relative overflow-hidden bg-white">
               <div className="container mx-auto px-4 py-16 sm:py-24">
@@ -74,7 +93,7 @@ const Index = () => {
                     <Button 
                       size="lg" 
                       className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
-                      onClick={() => setCurrentStep('clothes')}
+                      onClick={handleBookingStart}
                     >
                       Book Laundry Service
                     </Button>
@@ -217,7 +236,7 @@ const Index = () => {
                 <Button 
                   size="lg" 
                   className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg"
-                  onClick={() => setCurrentStep('clothes')}
+                  onClick={handleBookingStart}
                 >
                   Start Your Order
                 </Button>
