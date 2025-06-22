@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -35,6 +35,37 @@ const PricingCalculator = ({
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
   const { user, session } = useAuth();
+
+  // Auto-populate customer name from user profile
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (user && !customerName) {
+        try {
+          // First try to get from user metadata
+          const fullName = user.user_metadata?.full_name;
+          if (fullName) {
+            setCustomerName(fullName);
+            return;
+          }
+
+          // If not in metadata, try to get from profiles table
+          const { data: profile, error } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          if (!error && profile?.full_name) {
+            setCustomerName(profile.full_name);
+          }
+        } catch (error) {
+          console.error('Error fetching user profile:', error);
+        }
+      }
+    };
+
+    fetchUserProfile();
+  }, [user, customerName]);
 
   // Calculate total using the same logic as ClothingSelector
   const totalAmount = selectedClothes.reduce((total, item) => {
@@ -72,7 +103,9 @@ const PricingCalculator = ({
     setUploading(true);
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+      // Include customer name in filename for easy identification
+      const sanitizedCustomerName = customerName.replace(/[^a-zA-Z0-9]/g, '_');
+      const fileName = `${user.id}/${sanitizedCustomerName}_${Date.now()}.${fileExt}`;
 
       const { data, error } = await supabase.storage
         .from('receipts')

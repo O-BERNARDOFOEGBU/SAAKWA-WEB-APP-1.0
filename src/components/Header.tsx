@@ -15,14 +15,61 @@ import { Label } from "@/components/ui/label";
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
-const Header = () => {
+interface HeaderProps {
+  showAuthModal?: boolean;
+  setShowAuthModal?: (show: boolean) => void;
+}
+
+const Header = ({ showAuthModal = false, setShowAuthModal }: HeaderProps) => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
-  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [internalAuthModal, setInternalAuthModal] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isResetMode, setIsResetMode] = useState(false);
+
+  // Use external modal state if provided, otherwise use internal state
+  const authModalOpen = setShowAuthModal ? showAuthModal : internalAuthModal;
+  const setAuthModalOpen = setShowAuthModal || setInternalAuthModal;
+
+  const handlePasswordReset = async () => {
+    if (!email) {
+      toast({
+        title: "Email Required",
+        description: "Please enter your email address to reset password",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth`,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Password Reset Email Sent",
+        description: "Please check your email for password reset instructions.",
+      });
+      
+      setIsResetMode(false);
+      setEmail('');
+    } catch (error) {
+      console.error("Password reset error:", error);
+      toast({
+        title: "Reset Error",
+        description: error.message || "Failed to send reset email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSignUp = async () => {
     if (!email || !password || !fullName) {
@@ -65,7 +112,7 @@ const Header = () => {
         description: "Please check your email to verify your account.",
       });
       
-      setShowAuthModal(false);
+      setAuthModalOpen(false);
       setEmail('');
       setPassword('');
       setFullName('');
@@ -105,7 +152,7 @@ const Header = () => {
         description: "You have successfully signed in.",
       });
       
-      setShowAuthModal(false);
+      setAuthModalOpen(false);
       setEmail('');
       setPassword('');
     } catch (error) {
@@ -152,7 +199,7 @@ const Header = () => {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setShowAuthModal(true)}
+                onClick={() => setAuthModalOpen(true)}
                 className="flex items-center gap-2"
               >
                 <LogIn className="w-4 h-4" />
@@ -164,12 +211,17 @@ const Header = () => {
       </header>
 
       {/* Auth Modal */}
-      <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>
+      <Dialog open={authModalOpen} onOpenChange={setAuthModalOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Sign In or Create Account</DialogTitle>
+            <DialogTitle>
+              {isResetMode ? "Reset Password" : "Sign In or Create Account"}
+            </DialogTitle>
             <DialogDescription>
-              Sign in to your account or create a new one to book our services
+              {isResetMode 
+                ? "Enter your email to receive password reset instructions"
+                : "Sign in to your account or create a new one to book our services"
+              }
             </DialogDescription>
           </DialogHeader>
 
@@ -186,51 +238,94 @@ const Header = () => {
               />
             </div>
 
-            <div>
-              <Label htmlFor="auth-password">Password *</Label>
-              <Input
-                id="auth-password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter password (min 6 characters)"
-                required
-                minLength={6}
-              />
-            </div>
+            {!isResetMode && (
+              <>
+                <div>
+                  <Label htmlFor="auth-password">Password *</Label>
+                  <Input
+                    id="auth-password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter password (min 6 characters)"
+                    required
+                    minLength={6}
+                  />
+                </div>
 
-            <div>
-              <Label htmlFor="auth-name">Full Name (for new accounts)</Label>
-              <Input
-                id="auth-name"
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your full name"
-              />
-            </div>
+                <div>
+                  <Label htmlFor="auth-name">Full Name (for new accounts)</Label>
+                  <Input
+                    id="auth-name"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Enter your full name"
+                  />
+                </div>
+              </>
+            )}
 
             <div className="flex gap-2">
-              <Button
-                onClick={handleSignIn}
-                disabled={loading}
-                className="flex-1"
-                variant="outline"
-              >
-                {loading ? "Signing In..." : "Sign In"}
-              </Button>
+              {isResetMode ? (
+                <>
+                  <Button
+                    onClick={handlePasswordReset}
+                    disabled={loading}
+                    className="flex-1"
+                  >
+                    {loading ? "Sending..." : "Send Reset Email"}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setIsResetMode(false);
+                      setEmail('');
+                    }}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    Back to Sign In
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    onClick={handleSignIn}
+                    disabled={loading}
+                    className="flex-1"
+                    variant="outline"
+                  >
+                    {loading ? "Signing In..." : "Sign In"}
+                  </Button>
 
-              <Button
-                onClick={handleSignUp}
-                disabled={loading}
-                className="flex-1"
-              >
-                {loading ? "Creating..." : "Create Account"}
-              </Button>
+                  <Button
+                    onClick={handleSignUp}
+                    disabled={loading}
+                    className="flex-1"
+                  >
+                    {loading ? "Creating..." : "Create Account"}
+                  </Button>
+                </>
+              )}
             </div>
 
+            {!isResetMode && (
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => setIsResetMode(true)}
+                  className="text-blue-600 hover:underline text-sm"
+                >
+                  Forgot your password?
+                </button>
+              </div>
+            )}
+
             <p className="text-xs text-gray-500 text-center">
-              Existing customers can sign in, new customers can create an account
+              {isResetMode 
+                ? "You'll receive an email with instructions to reset your password"
+                : "Existing customers can sign in, new customers can create an account"
+              }
             </p>
           </div>
         </DialogContent>

@@ -1,10 +1,8 @@
-
 import { useState } from 'react';
 import { Calendar, MapPin, Star, Users, Clock, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/hooks/useAuth';
-import { useToast } from '@/hooks/use-toast';
 import Header from '@/components/Header';
 import ClothingSelector from '@/components/ClothingSelector';
 import SchedulePicker from '@/components/SchedulePicker';
@@ -18,16 +16,12 @@ const Index = () => {
   const [deliveryDate, setDeliveryDate] = useState(null);
   const [pickupTimeSlot, setPickupTimeSlot] = useState(null);
   const [deliveryTimeSlot, setDeliveryTimeSlot] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const { user } = useAuth();
-  const { toast } = useToast();
 
   const handleBookingStart = () => {
     if (!user) {
-      toast({
-        title: "Please Sign In",
-        description: "You need to sign in or create an account to book our services.",
-        variant: "destructive",
-      });
+      setShowAuthModal(true);
       return;
     }
     setCurrentStep('clothes');
@@ -75,7 +69,10 @@ const Index = () => {
       default:
         return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
-            <Header />
+            <Header 
+              showAuthModal={showAuthModal}
+              setShowAuthModal={setShowAuthModal}
+            />
             
             {/* Hero Section */}
             <div className="relative overflow-hidden bg-white">
