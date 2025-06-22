@@ -1,7 +1,12 @@
-
-import { ArrowLeft, MapPin, Clock, Phone, CheckCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft, MapPin, Clock, Phone, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface ServiceAreaProps {
   onBack: () => void;
@@ -10,23 +15,26 @@ interface ServiceAreaProps {
 const ServiceArea = ({ onBack }: ServiceAreaProps) => {
   const serviceAreas = [
     {
-      name: 'Victoria Island (VI)',
-      description: 'All areas including Ahmadu Bello Way, Tiamiyu Savage, Adeola Odeku',
-      coverage: '100%',
-      timing: '9 AM - 7 PM'
+      name: "Victoria Island (VI)",
+      description:
+        "All areas including Ahmadu Bello Way, Tiamiyu Savage, Adeola Odeku",
+      coverage: "100%",
+      timing: "9 AM - 7 PM",
     },
     {
-      name: 'Marina',
-      description: 'Lagos Island, Marina area, and surrounding business districts',
-      coverage: '100%',
-      timing: '9 AM - 7 PM'
+      name: "Marina",
+      description:
+        "Lagos Island, Marina area, and surrounding business districts",
+      coverage: "100%",
+      timing: "9 AM - 7 PM",
     },
     {
-      name: 'Heart of Lekki',
-      description: 'Lekki Phase 1, Admiralty Way, and central Lekki areas',
-      coverage: '100%',
-      timing: '9 AM - 7 PM'
-    }
+      name: "Heart of Lekki",
+      description:
+        "Lekki Phase 1, Admiralty Way, and central Lekki areas, All the way to Osapa, Agungi, Chevron to Ikota",
+      coverage: "100%",
+      timing: "9 AM - 7 PM",
+    },
   ];
 
   return (
@@ -37,8 +45,13 @@ const ServiceArea = ({ onBack }: ServiceAreaProps) => {
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Button>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Service Areas</h1>
-          <p className="text-gray-600">We provide premium laundry pickup and delivery services across these areas.</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Service Areas
+          </h1>
+          <p className="text-gray-600">
+            We provide premium laundry pickup and delivery services across these
+            areas.
+          </p>
         </div>
 
         {/* Map Placeholder */}
@@ -47,8 +60,12 @@ const ServiceArea = ({ onBack }: ServiceAreaProps) => {
             <div className="bg-gradient-to-br from-blue-100 to-blue-200 h-64 flex items-center justify-center">
               <div className="text-center">
                 <MapPin className="w-16 h-16 text-blue-600 mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-gray-800">Interactive Map Coming Soon</h3>
-                <p className="text-gray-600">View our complete service coverage area</p>
+                <h3 className="text-xl font-semibold text-gray-800">
+                  Interactive Map Coming Soon
+                </h3>
+                <p className="text-gray-600">
+                  View our complete service coverage area
+                </p>
               </div>
             </div>
           </CardContent>
@@ -65,7 +82,9 @@ const ServiceArea = ({ onBack }: ServiceAreaProps) => {
                       <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
                       {area.name}
                     </CardTitle>
-                    <CardDescription className="mt-2">{area.description}</CardDescription>
+                    <CardDescription className="mt-2">
+                      {area.description}
+                    </CardDescription>
                   </div>
                 </div>
               </CardHeader>
@@ -73,7 +92,9 @@ const ServiceArea = ({ onBack }: ServiceAreaProps) => {
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Coverage</span>
-                    <span className="font-semibold text-green-600">{area.coverage}</span>
+                    <span className="font-semibold text-green-600">
+                      {area.coverage}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm text-gray-600">Service Hours</span>
@@ -134,12 +155,16 @@ const ServiceArea = ({ onBack }: ServiceAreaProps) => {
                 <div>
                   <div className="font-semibold">Email Support</div>
                   <div className="text-gray-600">support@saakwa.com</div>
-                  <div className="text-sm text-gray-500">Response within 2 hours</div>
+                  <div className="text-sm text-gray-500">
+                    Response within 2 hours
+                  </div>
                 </div>
                 <div>
                   <div className="font-semibold">Emergency Line</div>
                   <div className="text-gray-600">+234 XXX XXX XXXX</div>
-                  <div className="text-sm text-gray-500">For urgent delivery issues</div>
+                  <div className="text-sm text-gray-500">
+                    For urgent delivery issues
+                  </div>
                 </div>
               </div>
             </CardContent>
@@ -149,17 +174,25 @@ const ServiceArea = ({ onBack }: ServiceAreaProps) => {
         {/* Call to Action */}
         <Card className="mt-8 bg-blue-600 text-white">
           <CardContent className="text-center py-8">
-            <h2 className="text-2xl font-bold mb-4">Ready to Experience Saakwa?</h2>
+            <h2 className="text-2xl font-bold mb-4">
+              Ready to Experience Saakwa?
+            </h2>
             <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
-              Join hundreds of satisfied customers who trust us with their laundry. 
-              Premium service, great savings, and convenient pickup & delivery.
+              Join hundreds of satisfied customers who trust us with their
+              laundry. Premium service, great savings, and convenient pickup &
+              delivery.
             </p>
-            <Button 
+            <Button
               className="bg-white text-blue-600 hover:bg-gray-100"
               onClick={onBack}
             >
               Start Your Order
             </Button>
+            <div className="mt-auto pt-12">
+              <p className=" text-gray-300">
+                Saakwa – Powered by Oparantho Ventures
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
