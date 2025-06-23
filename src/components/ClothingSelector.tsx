@@ -299,7 +299,7 @@ const ClothingSelector = ({
           </h1>
           <p className="text-gray-600">
             Choose the items you want to launder. Prices are 25% less than
-            VI/Marina rates!
+            prices in VI/Marina/Heart of Lekki and environs
           </p>
 
           <div className="mt-4 max-w-xs">
