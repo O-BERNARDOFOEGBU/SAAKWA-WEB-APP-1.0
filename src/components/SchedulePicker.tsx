@@ -66,19 +66,20 @@ const SchedulePicker = ({
   // Check if we can still book for today (before 5pm)
   const canBookToday = currentHour < 17;
 
-  // For pickup dates: allow same day if it's Tue/Sat and before 5pm, otherwise from tomorrow
+  // For pickup dates: allow same day if it's Tue/Sat and before 5pm, or next day if it's Tue/Sat
   const isPickupDateDisabled = (date: Date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    date.setHours(0, 0, 0, 0);
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
     
     // If it's today and it's Tue/Sat and before 5pm, allow it
-    if (date.getTime() === today.getTime()) {
-      return !isTuesdayOrSaturday(date) || !canBookToday;
+    if (checkDate.getTime() === today.getTime()) {
+      return !isTuesdayOrSaturday(checkDate) || !canBookToday;
     }
     
-    // For future dates, only allow if it's Tue/Sat
-    return date < today || !isTuesdayOrSaturday(date);
+    // For future dates, only allow if it's Tue/Sat and not in the past
+    return checkDate < today || !isTuesdayOrSaturday(checkDate);
   };
 
   // For delivery: minimum 2 days after pickup
@@ -87,7 +88,12 @@ const SchedulePicker = ({
     : new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
   const isDeliveryDateDisabled = (date: Date) => {
-    return date < minDeliveryDate || !isTuesdayOrSaturday(date);
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+    const minDate = new Date(minDeliveryDate);
+    minDate.setHours(0, 0, 0, 0);
+    
+    return checkDate < minDate || !isTuesdayOrSaturday(checkDate);
   };
 
   return (
@@ -282,7 +288,7 @@ const SchedulePicker = ({
               </div>
             </div>
           </CardContent>
-        </div>
+        </Card>
 
         <div className="mt-8 flex justify-end">
           <Button
