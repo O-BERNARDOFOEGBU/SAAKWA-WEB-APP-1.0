@@ -134,7 +134,8 @@ const Index = () => {
                     <CardContent>
                       <CardDescription className="text-gray-600">
                         Professional laundry service with attention to detail.
-                        Your clothes are treated with care at Vee Laundry House.
+                        Your clothes are treated with care at our Laundry
+                        Houses.
                       </CardDescription>
                     </CardContent>
                   </Card>
@@ -165,8 +166,8 @@ const Index = () => {
                     </CardHeader>
                     <CardContent>
                       <CardDescription className="text-gray-600">
-                        Get premium laundry service at 25% less than local
-                        VI/Marina prices, plus the convenience of delivery.
+                        Get premium laundry service at 25% less than your local
+                        Laundry House prices, plus the convenience of delivery.
                       </CardDescription>
                     </CardContent>
                   </Card>
@@ -255,7 +256,7 @@ const Index = () => {
                       Trusted Partner
                     </h3>
                     <p className="text-gray-600">
-                      Working with established Vee Laundry House
+                      Working with established Laundry Houses
                     </p>
                   </div>
                 </div>
