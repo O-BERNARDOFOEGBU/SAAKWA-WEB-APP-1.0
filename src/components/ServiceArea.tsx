@@ -1,4 +1,11 @@
-import { ArrowLeft, MapPin, Clock, Phone, CheckCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  MapPin,
+  Clock,
+  Phone,
+  CheckCircle,
+  MessageCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -36,6 +43,15 @@ const ServiceArea = ({ onBack }: ServiceAreaProps) => {
       timing: "9 AM - 7 PM",
     },
   ];
+
+  const openWhatsApp = () => {
+    const message = `Hi! I have a complaint for Saakwa Laundry`;
+    const phoneNumber = "2349160391653";
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
+      message
+    )}`;
+    window.open(whatsappUrl, "_blank");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -149,7 +165,7 @@ const ServiceArea = ({ onBack }: ServiceAreaProps) => {
               <div className="space-y-4">
                 <div>
                   <div className="font-semibold">Customer Service</div>
-                  <div className="text-gray-600">+234 XXX XXX XXXX</div>
+                  <div className="text-gray-600">+234 916 039 1653 </div>
                   <div className="text-sm text-gray-500">Available 24/7</div>
                 </div>
                 <div>
@@ -161,9 +177,16 @@ const ServiceArea = ({ onBack }: ServiceAreaProps) => {
                 </div>
                 <div>
                   <div className="font-semibold">Emergency Line</div>
-                  <div className="text-gray-600">+234 XXX XXX XXXX</div>
+                  <div className="text-sm text-gray-500">For quick support</div>
                   <div className="text-sm text-gray-500">
-                    For urgent delivery issues
+                    Drop us a message on{" "}
+                    <button
+                      onClick={openWhatsApp}
+                      className="inline-flex items-center text-blue-600 hover:underline hover:text-blue-700 transition"
+                    >
+                      <MessageCircle className="w-4 h-4 mr-1" />
+                      WhatsApp
+                    </button>{" "}
                   </div>
                 </div>
               </div>
