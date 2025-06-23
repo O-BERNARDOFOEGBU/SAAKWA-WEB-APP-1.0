@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,16 +49,16 @@ const PricingCalculator = ({
 
           // If not in metadata, try to get from profiles table
           const { data: profile, error } = await supabase
-            .from('profiles')
-            .select('full_name')
-            .eq('id', user.id)
+            .from("profiles")
+            .select("full_name")
+            .eq("id", user.id)
             .maybeSingle();
 
           if (!error && profile?.full_name) {
             setCustomerName(profile.full_name);
           }
         } catch (error) {
-          console.error('Error fetching user profile:', error);
+          console.error("Error fetching user profile:", error);
         }
       }
     };
@@ -102,13 +101,15 @@ const PricingCalculator = ({
 
     setUploading(true);
     try {
-      const fileExt = file.name.split('.').pop();
+      const fileExt = file.name.split(".").pop();
       // Include customer name in filename for easy identification
-      const sanitizedCustomerName = customerName.replace(/[^a-zA-Z0-9]/g, '_');
-      const fileName = `${user.id}/${sanitizedCustomerName}_${Date.now()}.${fileExt}`;
+      const sanitizedCustomerName = customerName.replace(/[^a-zA-Z0-9]/g, "_");
+      const fileName = `${
+        user.id
+      }/${sanitizedCustomerName}_${Date.now()}.${fileExt}`;
 
       const { data, error } = await supabase.storage
-        .from('receipts')
+        .from("receipts")
         .upload(fileName, file);
 
       if (error) throw error;
@@ -116,7 +117,7 @@ const PricingCalculator = ({
       setUploadedFile({
         name: file.name,
         path: data.path,
-        url: data.path
+        url: data.path,
       });
 
       toast({
@@ -124,7 +125,7 @@ const PricingCalculator = ({
         description: "Your payment receipt has been uploaded successfully",
       });
     } catch (error) {
-      console.error('Error uploading file:', error);
+      console.error("Error uploading file:", error);
       toast({
         title: "Upload failed",
         description: "Failed to upload receipt. Please try again.",
@@ -137,7 +138,7 @@ const PricingCalculator = ({
 
   const openWhatsApp = () => {
     const message = `Hi! I need help confirming my payment for Saakwa Laundry booking. Total amount: ₦${totalAmount.toLocaleString()}`;
-    const phoneNumber = "2347060859311";
+    const phoneNumber = "2349160391653";
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
       message
     )}`;
@@ -187,7 +188,7 @@ const PricingCalculator = ({
       setCustomerPhone("");
       setCustomerAddress("");
       setUploadedFile(null);
-      setShowPaymentModal(false);
+      setShowPaymentModal(true);
 
       return data;
     } catch (error) {
@@ -210,7 +211,8 @@ const PricingCalculator = ({
     if (!user || !session) {
       toast({
         title: "Please Sign In",
-        description: "You need to sign in or create an account to complete your booking.",
+        description:
+          "You need to sign in or create an account to complete your booking.",
         variant: "destructive",
       });
       return;
@@ -295,7 +297,7 @@ const PricingCalculator = ({
                   id="address"
                   value={customerAddress}
                   onChange={(e) => setCustomerAddress(e.target.value)}
-                  placeholder="Enter your full address for pickup"
+                  placeholder="Enter your full address as it appears on Google Maps for pickup."
                   required
                   rows={3}
                 />
@@ -363,7 +365,9 @@ const PricingCalculator = ({
                     !user
                   }
                 >
-                  {!user ? "Please Sign In First" : `Complete Booking - ₦${totalAmount.toLocaleString()}`}
+                  {!user
+                    ? "Please Sign In First"
+                    : `Complete Booking - ₦${totalAmount.toLocaleString()}`}
                 </Button>
               </div>
             </CardContent>
@@ -431,9 +435,7 @@ const PricingCalculator = ({
                   disabled={uploading || !user}
                 />
                 {uploading && (
-                  <p className="text-sm text-blue-600 mt-1">
-                    Uploading...
-                  </p>
+                  <p className="text-sm text-blue-600 mt-1">Uploading...</p>
                 )}
                 {uploadedFile && (
                   <p className="text-sm text-green-600 mt-1">
@@ -469,9 +471,10 @@ const PricingCalculator = ({
                 </p>
               )}
 
-              <p className="text-xs text-gray-500 text-center">
-                If you don't have a receipt, click WhatsApp to contact us for
-                payment confirmation
+              <p className="text-xs font-medium text-gray-600 text-center">
+                Made a transfer without a receipt? Click Confirm Payment, then
+                message us on WhatsApp to confirm. You can also message us
+                anytime to speed up your pickup.
               </p>
             </div>
           </DialogContent>
