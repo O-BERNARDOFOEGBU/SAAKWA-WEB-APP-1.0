@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -56,6 +55,7 @@ const SchedulePicker = ({
 
   const now = new Date();
   const currentHour = now.getHours();
+  const currentMinutes = now.getMinutes();
   
   // Function to check if a date is Tuesday (2) or Saturday (6)
   const isTuesdayOrSaturday = (date: Date) => {
@@ -63,8 +63,8 @@ const SchedulePicker = ({
     return day === 2 || day === 6; // 2 = Tuesday, 6 = Saturday
   };
 
-  // Check if we can still book for today (before 5pm)
-  const canBookToday = currentHour < 17;
+  // Check if we can still book for today (before 1:30pm)
+  const canBookToday = currentHour < 13 || (currentHour === 13 && currentMinutes < 30);
 
   // For pickup dates: allow same day if it's Tue/Sat and before 5pm, or next day if it's Tue/Sat
   const isPickupDateDisabled = (date: Date) => {
@@ -109,7 +109,7 @@ const SchedulePicker = ({
           </h1>
           <p className="text-gray-600">
             Choose your preferred pickup and delivery dates. We provide 48-72
-            hour service on Tuesdays and Saturdays only. You can book for today until 5pm.
+            hour service on Tuesdays and Saturdays only. You can book for today until 1:30pm.
           </p>
         </div>
 
@@ -125,7 +125,7 @@ const SchedulePicker = ({
                 When should we collect your clothes? (Tuesdays & Saturdays only)
                 {canBookToday && isTuesdayOrSaturday(now) && (
                   <span className="block text-green-600 font-medium mt-1">
-                    ✅ You can still book for today (before 5pm)
+                    ✅ You can still book for today (before 1:30pm)
                   </span>
                 )}
               </CardDescription>
@@ -283,7 +283,7 @@ const SchedulePicker = ({
                 <div className="w-2 h-2 bg-purple-600 rounded-full mt-2"></div>
                 <div>
                   <div className="font-semibold">Booking Cutoff</div>
-                  <div className="text-gray-600">Same day until 5:00 PM</div>
+                  <div className="text-gray-600">Same day until 1:30 PM</div>
                 </div>
               </div>
             </div>

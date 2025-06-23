@@ -118,8 +118,8 @@ ${clothesList}
     `;
 
     const emailResponse = await resend.emails.send({
-      from: "Saakwa Laundry <onboarding@resend.dev>",
-      to: ["Bernardofoegbu71@gmail.com"],
+      from: "Saakwa Laundry <bernardofoegbu71@gmail.com>",
+      to: ["bernardofoegbu71@gmail.com"],
       subject: `🧺 New Order - ${orderData.customer_name} - ₦${orderData.total_amount.toLocaleString()}`,
       html: emailHtml,
     });
