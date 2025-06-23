@@ -178,6 +178,42 @@ const PricingCalculator = ({
 
       console.log("Booking saved successfully:", data);
 
+      // Send email notification after successful booking
+      if (data && data[0]) {
+        try {
+          console.log("Sending email notification...");
+          const { data: emailData, error: emailError } = await supabase.functions.invoke(
+            'send-order-notification',
+            {
+              body: {
+                id: data[0].id,
+                customer_name: customerName,
+                customer_phone: customerPhone,
+                customer_address: customerAddress,
+                selected_clothes: selectedClothes,
+                pickup_date: pickupDate,
+                delivery_date: deliveryDate,
+                pickup_time_slot: pickupTimeSlot,
+                delivery_time_slot: deliveryTimeSlot,
+                total_amount: totalAmount,
+                payment_status: uploadedFile ? "pending" : "pending",
+                receipt_url: uploadedFile ? uploadedFile.path : null,
+                created_at: data[0].created_at,
+              }
+            }
+          );
+
+          if (emailError) {
+            console.error("Email notification error:", emailError);
+          } else {
+            console.log("Email notification sent successfully:", emailData);
+          }
+        } catch (emailError) {
+          console.error("Failed to send email notification:", emailError);
+          // Don't throw here as the booking was successful
+        }
+      }
+
       toast({
         title: "Booking Confirmed!",
         description:
