@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -53,26 +54,38 @@ const SchedulePicker = ({
     "5:00 PM - 7:00 PM",
   ];
 
-  const today = new Date();
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-
-  const minDeliveryDate = pickupDate
-    ? new Date(pickupDate.getTime() + 2 * 24 * 60 * 60 * 1000)
-    : tomorrow;
-
+  const now = new Date();
+  const currentHour = now.getHours();
+  
   // Function to check if a date is Tuesday (2) or Saturday (6)
   const isTuesdayOrSaturday = (date: Date) => {
     const day = date.getDay();
     return day === 2 || day === 6; // 2 = Tuesday, 6 = Saturday
   };
 
-  // Disable dates that are not Tuesday or Saturday, or are before tomorrow
+  // Check if we can still book for today (before 5pm)
+  const canBookToday = currentHour < 17;
+
+  // For pickup dates: allow same day if it's Tue/Sat and before 5pm, otherwise from tomorrow
   const isPickupDateDisabled = (date: Date) => {
-    return date < tomorrow || !isTuesdayOrSaturday(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    date.setHours(0, 0, 0, 0);
+    
+    // If it's today and it's Tue/Sat and before 5pm, allow it
+    if (date.getTime() === today.getTime()) {
+      return !isTuesdayOrSaturday(date) || !canBookToday;
+    }
+    
+    // For future dates, only allow if it's Tue/Sat
+    return date < today || !isTuesdayOrSaturday(date);
   };
 
-  // Disable dates that are not Tuesday or Saturday, or are before minimum delivery date
+  // For delivery: minimum 2 days after pickup
+  const minDeliveryDate = pickupDate
+    ? new Date(pickupDate.getTime() + 2 * 24 * 60 * 60 * 1000)
+    : new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
   const isDeliveryDateDisabled = (date: Date) => {
     return date < minDeliveryDate || !isTuesdayOrSaturday(date);
   };
@@ -90,7 +103,7 @@ const SchedulePicker = ({
           </h1>
           <p className="text-gray-600">
             Choose your preferred pickup and delivery dates. We provide 48-72
-            hour service on Tuesdays and Saturdays only.
+            hour service on Tuesdays and Saturdays only. You can book for today until 5pm.
           </p>
         </div>
 
@@ -104,6 +117,11 @@ const SchedulePicker = ({
               </CardTitle>
               <CardDescription>
                 When should we collect your clothes? (Tuesdays & Saturdays only)
+                {canBookToday && isTuesdayOrSaturday(now) && (
+                  <span className="block text-green-600 font-medium mt-1">
+                    ✅ You can still book for today (before 5pm)
+                  </span>
+                )}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -258,13 +276,13 @@ const SchedulePicker = ({
               <div className="flex items-start space-x-2">
                 <div className="w-2 h-2 bg-purple-600 rounded-full mt-2"></div>
                 <div>
-                  <div className="font-semibold">Service Hours</div>
-                  <div className="text-gray-600">9:00 AM - 7:00 PM</div>
+                  <div className="font-semibold">Booking Cutoff</div>
+                  <div className="text-gray-600">Same day until 5:00 PM</div>
                 </div>
               </div>
             </div>
           </CardContent>
-        </Card>
+        </div>
 
         <div className="mt-8 flex justify-end">
           <Button
