@@ -221,9 +221,17 @@ const clothingCategories = {
   ],
 };
 
+interface ClothingItem {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+}
+
 interface ClothingSelectorProps {
-  selectedClothes: any[];
-  setSelectedClothes: (clothes: any[]) => void;
+  selectedClothes: ClothingItem[];
+  setSelectedClothes: (clothes: ClothingItem[]) => void;
   onNext: () => void;
   onBack: () => void;
 }
