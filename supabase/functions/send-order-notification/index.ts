@@ -142,7 +142,7 @@ ${clothesList}
     `;
 
     const emailResponse = await resend.emails.send({
-      from: "Saakwa Laundry",
+      from: "Saakwa Laundry <bernardofoegbu71@gmail.com>",
       to: ["obinnaofoegbu71@gmail.com"],
       subject: `🧺 New Order - ${
         orderData.customer_name
