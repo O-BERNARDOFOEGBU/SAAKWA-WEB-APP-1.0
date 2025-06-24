@@ -1,3 +1,4 @@
+import { track } from "@vercel/analytics";
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -56,7 +57,7 @@ const SchedulePicker = ({
   const now = new Date();
   const currentHour = now.getHours();
   const currentMinutes = now.getMinutes();
-  
+
   // Function to check if a date is Tuesday (2) or Saturday (6)
   const isTuesdayOrSaturday = (date: Date) => {
     const day = date.getDay();
@@ -64,7 +65,8 @@ const SchedulePicker = ({
   };
 
   // Check if we can still book for today (before 1:30pm)
-  const canBookToday = currentHour < 13 || (currentHour === 13 && currentMinutes < 30);
+  const canBookToday =
+    currentHour < 13 || (currentHour === 13 && currentMinutes < 30);
 
   // For pickup dates: allow same day if it's Tue/Sat and before 5pm, or next day if it's Tue/Sat
   const isPickupDateDisabled = (date: Date) => {
@@ -72,12 +74,12 @@ const SchedulePicker = ({
     today.setHours(0, 0, 0, 0);
     const checkDate = new Date(date);
     checkDate.setHours(0, 0, 0, 0);
-    
+
     // If it's today and it's Tue/Sat and before 5pm, allow it
     if (checkDate.getTime() === today.getTime()) {
       return !isTuesdayOrSaturday(checkDate) || !canBookToday;
     }
-    
+
     // For future dates, only allow if it's Tue/Sat and not in the past
     return checkDate < today || !isTuesdayOrSaturday(checkDate);
   };
@@ -92,7 +94,7 @@ const SchedulePicker = ({
     checkDate.setHours(0, 0, 0, 0);
     const minDate = new Date(minDeliveryDate);
     minDate.setHours(0, 0, 0, 0);
-    
+
     return checkDate < minDate || !isTuesdayOrSaturday(checkDate);
   };
 
@@ -109,7 +111,8 @@ const SchedulePicker = ({
           </h1>
           <p className="text-gray-600">
             Choose your preferred pickup and delivery dates. We provide 48-72
-            hour service on Tuesdays and Saturdays only. You can book for today until 1:30pm.
+            hour service on Tuesdays and Saturdays only. You can book for today
+            until 1:30pm.
           </p>
         </div>
 
@@ -292,7 +295,11 @@ const SchedulePicker = ({
 
         <div className="mt-8 flex justify-end">
           <Button
-            onClick={onNext}
+            onClick={() => {
+              track("Continue to Pricing Button Clicked");
+              onNext();
+            }}
+            // onClick={onNext}
             disabled={
               !pickupDate ||
               !deliveryDate ||
