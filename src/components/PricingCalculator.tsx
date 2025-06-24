@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,6 +34,7 @@ const PricingCalculator = ({
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
   const { user, session } = useAuth();
+  const [isClicked, setIsClicked] = useState(false);
 
   // Auto-populate customer name from user profile
   useEffect(() => {
@@ -66,6 +66,14 @@ const PricingCalculator = ({
 
     fetchUserProfile();
   }, [user, customerName]);
+
+  const resetForm = () => {
+    setCustomerName("");
+    setCustomerPhone("");
+    setCustomerAddress("");
+    setUploadedFile(null);
+    setIsClicked(false);
+  };
 
   // Calculate total using the same logic as ClothingSelector
   const totalAmount = selectedClothes.reduce((total, item) => {
@@ -182,9 +190,8 @@ const PricingCalculator = ({
       if (data && data[0]) {
         try {
           console.log("Sending email notification...");
-          const { data: emailData, error: emailError } = await supabase.functions.invoke(
-            'send-order-notification',
-            {
+          const { data: emailData, error: emailError } =
+            await supabase.functions.invoke("send-order-notification", {
               body: {
                 id: data[0].id,
                 customer_name: customerName,
@@ -199,9 +206,8 @@ const PricingCalculator = ({
                 payment_status: uploadedFile ? "pending" : "pending",
                 receipt_url: uploadedFile ? uploadedFile.path : null,
                 created_at: data[0].created_at,
-              }
-            }
-          );
+              },
+            });
 
           if (emailError) {
             console.error("Email notification error:", emailError);
@@ -260,6 +266,7 @@ const PricingCalculator = ({
   };
 
   const handleConfirmPayment = async () => {
+    setIsClicked(true);
     // Double-check authentication
     if (!user || !session) {
       toast({
@@ -268,6 +275,7 @@ const PricingCalculator = ({
         variant: "destructive",
       });
       setShowPaymentModal(false);
+      setIsClicked(false); // 🔥 Important: Reset click state if early exit
       return;
     }
 
@@ -281,6 +289,7 @@ const PricingCalculator = ({
         description: `Failed to submit booking: ${error.message}`,
         variant: "destructive",
       });
+      setIsClicked(false); // 🔥 Important: Allow retry on error
     } finally {
       setLoading(false);
     }
@@ -291,7 +300,10 @@ const PricingCalculator = ({
       <div className="container mx-auto px-4 max-w-4xl">
         <Button
           variant="outline"
-          onClick={onBack}
+          onClick={() => {
+            resetForm();
+            onBack();
+          }}
           className="mb-6 flex items-center gap-2"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -412,7 +424,17 @@ const PricingCalculator = ({
         </div>
 
         {/* Payment Modal */}
-        <Dialog open={showPaymentModal} onOpenChange={setShowPaymentModal}>
+        <Dialog
+          // open={showPaymentModal}
+          // onOpenChange={setShowPaymentModal}
+          open={showPaymentModal}
+          onOpenChange={(isOpen) => {
+            setShowPaymentModal(isOpen);
+            if (!isOpen) {
+              resetForm(); // Reset when modal is closed
+            }
+          }}
+        >
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Complete Payment</DialogTitle>
@@ -484,7 +506,7 @@ const PricingCalculator = ({
               <div className="flex gap-3">
                 <Button
                   onClick={handleConfirmPayment}
-                  disabled={loading || !user}
+                  disabled={loading || isClicked || !user}
                   className="flex-1"
                 >
                   {loading
