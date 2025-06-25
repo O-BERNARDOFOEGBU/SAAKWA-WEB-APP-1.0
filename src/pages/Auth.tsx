@@ -64,7 +64,19 @@ const Auth = () => {
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (event === "SIGNED_IN" && session) {
-          navigate("/");
+          // Check if this is a new user by looking at the user metadata
+          // New users will have a recent created_at timestamp
+          const userCreatedAt = new Date(session.user.created_at);
+          const now = new Date();
+          const timeDiff = now.getTime() - userCreatedAt.getTime();
+          const minutesDiff = timeDiff / (1000 * 60);
+
+          // If user was created within the last 30 minutes, consider them a new user
+          if (minutesDiff <= 30) {
+            navigate("/?newUser=true");
+          } else {
+            navigate("/");
+          }
         }
       }
     );

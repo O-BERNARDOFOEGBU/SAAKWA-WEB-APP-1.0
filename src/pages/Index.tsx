@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, MapPin, Star, Users, Clock, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,6 +16,9 @@ import ServiceArea from "@/components/ServiceArea";
 import PricingCalculator from "@/components/PricingCalculator";
 
 const Index = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isNewUser = searchParams.get("newUser") === "true";
+
   const [currentStep, setCurrentStep] = useState("home");
   const [selectedClothes, setSelectedClothes] = useState([]);
   const [pickupDate, setPickupDate] = useState(null);
@@ -24,6 +27,15 @@ const Index = () => {
   const [deliveryTimeSlot, setDeliveryTimeSlot] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { user } = useAuth();
+
+  // Check if this is a new user and redirect to clothing selector
+  useEffect(() => {
+    if (isNewUser && user) {
+      setCurrentStep("clothes");
+      // Remove the newUser parameter from URL
+      setSearchParams({});
+    }
+  }, [isNewUser, user, setSearchParams]);
 
   const handleBookingStart = () => {
     if (!user) {

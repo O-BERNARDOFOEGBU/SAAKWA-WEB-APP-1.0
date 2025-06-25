@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useAuth } from "@/hooks/useAuth";
 
 const clothingCategories = {
   "Traditional Wear": [
@@ -243,6 +244,23 @@ const ClothingSelector = ({
   onBack,
 }: ClothingSelectorProps) => {
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
+
+  // Check if this is a new user and show welcome message
+  useEffect(() => {
+    if (user) {
+      const userCreatedAt = new Date(user.created_at);
+      const now = new Date();
+      const timeDiff = now.getTime() - userCreatedAt.getTime();
+      const minutesDiff = timeDiff / (1000 * 60);
+
+      // If user was created within the last 30 minutes, show welcome
+      if (minutesDiff <= 30) {
+        setShowWelcome(true);
+        // Auto-hide welcome message after 5 seconds
+        setTimeout(() => setShowWelcome(false), 5000);
+      }
+    }
+  }, [user]);
 
   const allClothingItems = Object.values(clothingCategories).flat();
   const displayItems =
