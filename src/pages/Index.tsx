@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Calendar, MapPin, Star, Users, Clock, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {

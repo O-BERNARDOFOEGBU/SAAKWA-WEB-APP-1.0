@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Minus, ArrowLeft, ArrowRight } from "lucide-react";
+import { Plus, Minus, ArrowLeft, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -316,6 +316,25 @@ const ClothingSelector = ({
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
+      {/* Welcome Message for New Users */}
+      {showWelcome && (
+        <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-right-5">
+          <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white border-0 shadow-lg">
+            <CardContent className="p-4">
+              <div className="flex items-center space-x-3">
+                <Sparkles className="w-6 h-6 text-yellow-300" />
+                <div>
+                  <p className="font-semibold">Welcome to Saakwa Laundry!</p>
+                  <p className="text-blue-100 text-sm">
+                    Let's get your first order started 🎉
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       <div className="container mx-auto px-4">
         <div className="mb-8">
           <Button variant="ghost" onClick={onBack} className="mb-4">
