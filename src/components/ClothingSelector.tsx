@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Minus, ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -244,6 +244,8 @@ const ClothingSelector = ({
   onBack,
 }: ClothingSelectorProps) => {
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
+  const [showWelcome, setShowWelcome] = useState(false);
+  const { user } = useAuth();
 
   // Check if this is a new user and show welcome message
   useEffect(() => {
