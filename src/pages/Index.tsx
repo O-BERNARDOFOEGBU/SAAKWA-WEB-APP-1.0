@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Calendar, MapPin, Star, Users, Clock, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +32,11 @@ const Index = () => {
     }
     setCurrentStep("clothes");
   };
+
+  useEffect(() => {
+    if (!user || currentStep !== "home") return;
+    setCurrentStep("clothes");
+  }, [user, currentStep]);
 
   const renderStep = () => {
     switch (currentStep) {
