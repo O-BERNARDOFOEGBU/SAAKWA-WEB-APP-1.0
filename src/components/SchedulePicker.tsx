@@ -286,7 +286,7 @@ const SchedulePicker = ({
                 <div className="w-2 h-2 bg-purple-600 rounded-full mt-2"></div>
                 <div>
                   <div className="font-semibold">Booking Cutoff</div>
-                  <div className="text-gray-600">Same day until 1:30 PM</div>
+                  <div className="text-gray-600">Same day until 4:30 PM</div>
                 </div>
               </div>
             </div>
