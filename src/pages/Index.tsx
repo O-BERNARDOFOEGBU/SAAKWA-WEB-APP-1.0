@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+// import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Star, Users, Clock, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +25,8 @@ const Index = () => {
   const [deliveryTimeSlot, setDeliveryTimeSlot] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const { user } = useAuth();
+
+  // const navigate = useNavigate();
 
   const handleBookingStart = () => {
     if (!user) {
@@ -77,6 +80,7 @@ const Index = () => {
         );
       case "service-area":
         return <ServiceArea onBack={() => setCurrentStep("home")} />;
+      // return <ServiceArea onBack={() => navigate("/")} />;
       default:
         return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
@@ -85,9 +89,16 @@ const Index = () => {
               setShowAuthModal={setShowAuthModal}
             />
 
+            {/* {(currentStep === "home" || currentStep === "clothes") && (
+              <Header
+                showAuthModal={showAuthModal}
+                setShowAuthModal={setShowAuthModal}
+              />
+            )} */}
+
             {/* Hero Section */}
             <div className="relative overflow-hidden bg-white">
-              <div className="container mx-auto px-4 py-16 sm:py-24">
+              <div className="container mx-auto px-4 py- sm:py-24">
                 <div className="text-center">
                   <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 mb-6">
                     <span className="text-blue-600">Saakwa</span> Laundry
