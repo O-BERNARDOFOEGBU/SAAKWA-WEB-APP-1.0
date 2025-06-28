@@ -114,7 +114,7 @@ const clothingCategories = {
       price: 1100,
       image: "🩳",
     },
-    { id: "pants", name: "Pants", price: 1700, image: "👖" },
+    // { id: "pants", name: "Pants", price: 1700, image: "👖" }, --incase pant trousers
   ],
   "Women's Wear": [
     { id: "wedding-gown", name: "Wedding Gown", price: 25000, image: "👰" },
@@ -148,7 +148,10 @@ const clothingCategories = {
     { id: "hoodies", name: "Hoodies", price: 3200, image: "👕" },
     { id: "singlet", name: "Singlet", price: 700, image: "👕" },
   ],
-  Underwear: [{ id: "boxers", name: "Boxers", price: 800, image: "🩲" }],
+  Underwear: [
+    { id: "boxers", name: "Boxers", price: 800, image: "🩲" },
+    { id: "panties", name: "Panties", price: 1700, image: "🩲" },
+  ],
   Accessories: [
     { id: "face-cap", name: "Face Cap", price: 1700, image: "🧢" },
     { id: "hat", name: "Hat", price: 1000, image: "👒" },
@@ -215,7 +218,7 @@ const clothingCategories = {
     {
       id: "express-delivery",
       name: "Express Delivery (Same Day)",
-      price: 7700,
+      price: 10000,
       image: "🚀",
     },
   ],
@@ -306,7 +309,7 @@ const ClothingSelector = ({
             Select Your Clothes
           </h1>
           <p className="text-gray-600">
-            Choose the items you want to launder. Prices are 25% less than
+            Choose the items you want to launder. Prices are 25% less than usual
             prices in VI/Marina/Heart of Lekki and environs
           </p>
 
