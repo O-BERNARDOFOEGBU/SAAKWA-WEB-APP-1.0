@@ -64,9 +64,9 @@ const SchedulePicker = ({
     return day === 2 || day === 6; // 2 = Tuesday, 6 = Saturday
   };
 
-  // Check if we can still book for today (before 1:30pm)
+  // Check if we can still book for today (before 4:30pm)
   const canBookToday =
-    currentHour < 13 || (currentHour === 13 && currentMinutes < 30);
+    currentHour < 16 || (currentHour === 16 && currentMinutes < 30);
 
   // For pickup dates: allow same day if it's Tue/Sat and before 5pm, or next day if it's Tue/Sat
   const isPickupDateDisabled = (date: Date) => {
@@ -128,7 +128,7 @@ const SchedulePicker = ({
                 When should we collect your clothes? (Tuesdays & Saturdays only)
                 {canBookToday && isTuesdayOrSaturday(now) && (
                   <span className="block text-green-600 font-medium mt-1">
-                    ✅ You can still book for today (before 1:30pm)
+                    ✅ You can still book for today (before 4:30pm)
                   </span>
                 )}
               </CardDescription>
