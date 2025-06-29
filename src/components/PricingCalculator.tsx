@@ -146,7 +146,18 @@ const PricingCalculator = ({
   };
 
   const openWhatsApp = () => {
-    const message = `Hi! I need help confirming my payment for Saakwa Laundry booking. Total amount: ₦${totalAmount.toLocaleString()}`;
+    // Prepare booking data for WhatsApp message
+    const bookingData = `
+  Name: ${customerName}
+  Phone: ${customerPhone}
+  Address: ${customerAddress}
+  Pickup: ${pickupDate ? new Date(pickupDate).toLocaleDateString() : ""} ${pickupTimeSlot || ""}
+  Delivery: ${deliveryDate ? new Date(deliveryDate).toLocaleDateString() : ""} ${deliveryTimeSlot || ""}
+  Order: ${selectedClothes.map((item) => `${item.quantity} x ${item.name}`).join(", ")}
+  Total: ₦${totalAmount.toLocaleString()}
+    `.trim();
+
+    const message = `Hi! I need help confirming my payment for Saakwa Laundry booking:\n${bookingData}`;
     const phoneNumber = "2349160391653";
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
       message
