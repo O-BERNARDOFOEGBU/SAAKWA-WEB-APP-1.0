@@ -111,8 +111,8 @@ const SchedulePicker = ({
           </h1>
           <p className="text-gray-600">
             Choose your preferred pickup and delivery dates. We provide 48-72
-            hour service on Tuesdays and Saturdays only. You can book for today
-            until 1:30pm.
+            hour service on Tuesdays and Saturdays only. You can book on Pickup
+            Day up until 4:30pm.
           </p>
         </div>
 
