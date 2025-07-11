@@ -80,11 +80,6 @@ const PricingCalculator = ({
     return total + item.price * item.quantity;
   }, 0);
 
-  console.log("PricingCalculator - Selected clothes:", selectedClothes);
-  console.log("PricingCalculator - Total amount:", totalAmount);
-  console.log("PricingCalculator - Current user:", user);
-  console.log("PricingCalculator - Current session:", session);
-
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text);
     setCopied(true);

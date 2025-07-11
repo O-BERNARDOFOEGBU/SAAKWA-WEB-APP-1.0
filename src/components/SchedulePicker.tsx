@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/useAuth";
 
 interface SchedulePickerProps {
   pickupDate: Date | null;
@@ -45,6 +46,8 @@ const SchedulePicker = ({
 }: SchedulePickerProps) => {
   const [pickupOpen, setPickupOpen] = useState(false);
   const [deliveryOpen, setDeliveryOpen] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { user } = useAuth();
 
   const timeSlots = [
     "9:00 AM - 11:00 AM",

@@ -49,7 +49,6 @@ const Index = () => {
             selectedClothes={selectedClothes}
             setSelectedClothes={setSelectedClothes}
             onNext={() => setCurrentStep("schedule")}
-            onBack={() => setCurrentStep("home")}
           />
         );
       case "schedule":
