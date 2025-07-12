@@ -247,10 +247,10 @@ const PricingCalculator = ({
       });
 
       // Clear the form
-      setCustomerName("");
-      setCustomerPhone("");
-      setCustomerAddress("");
-      setUploadedFile(null);
+      // setCustomerName("");
+      // setCustomerPhone("");
+      // setCustomerAddress("");
+      // setUploadedFile(null);
       setShowPaymentModal(true);
 
       return data;
