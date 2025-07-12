@@ -36,6 +36,15 @@ const PricingCalculator = ({
   const { user, session } = useAuth();
   const [isClicked, setIsClicked] = useState(false);
 
+  useEffect(() => {
+    // Alert user to input phone and address when component loads
+    toast({
+      title: "Almost done!",
+      description: "Please input your phone number and address",
+      duration: 7000,
+    });
+  }, [toast]);
+
   // Auto-populate customer name from user profile
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -140,19 +149,22 @@ const PricingCalculator = ({
     }
   };
 
+  console.log("Phone:", customerPhone);
+  console.log("Address:", customerAddress);
+
   const openWhatsApp = () => {
     // Prepare booking data for WhatsApp message
     const bookingData = `
-  Name: ${customerName}
-  Phone: ${customerPhone}
-  Address: ${customerAddress}
-  Pickup: ${pickupDate ? new Date(pickupDate).toLocaleDateString() : ""} ${pickupTimeSlot || ""}
-  Delivery: ${deliveryDate ? new Date(deliveryDate).toLocaleDateString() : ""} ${deliveryTimeSlot || ""}
-  Order: ${selectedClothes.map((item) => `${item.quantity} x ${item.name}`).join(", ")}
-  Total: ₦${totalAmount.toLocaleString()}
+      Name: ${customerName}
+      Phone: ${customerPhone}
+      Address: ${customerAddress}
+      Pickup: ${pickupDate ? new Date(pickupDate).toLocaleDateString() : ""} ${pickupTimeSlot || ""}
+      Delivery: ${deliveryDate ? new Date(deliveryDate).toLocaleDateString() : ""} ${deliveryTimeSlot || ""}
+      Order: ${selectedClothes.map((item) => `${item.quantity} x ${item.name}`).join(", ")}
+      Total: ₦${totalAmount.toLocaleString()}
     `.trim();
 
-    const message = `Hi! I need help confirming my payment for Saakwa Laundry booking:\n${bookingData}`;
+    const message = `Hi! I need help confirming my payment for Saakwa Laundry booking: \n${bookingData}`;
     const phoneNumber = "2349160391653";
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
       message
@@ -288,6 +300,7 @@ const PricingCalculator = ({
     setLoading(true);
     try {
       await saveBookingToDatabase(user.id);
+      openWhatsApp();
     } catch (error) {
       console.error("Error submitting booking:", error);
       toast({
