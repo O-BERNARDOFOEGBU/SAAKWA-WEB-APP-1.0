@@ -314,9 +314,9 @@ const PricingCalculator = ({
       openWhatsApp(result.formData);
 
       // Clear the form after WhatsApp is opened
-      setCustomerName("");
-      setCustomerPhone("");
-      setCustomerAddress("");
+      setCustomerName(customerName);
+      setCustomerPhone(customerPhone);
+      setCustomerAddress(customerAddress);
       setUploadedFile(null);
       setShowPaymentModal(true);
     } catch (error) {
