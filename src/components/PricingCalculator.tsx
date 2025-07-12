@@ -153,12 +153,18 @@ const PricingCalculator = ({
   console.log("Phone:", customerPhone);
   console.log("Address:", customerAddress);
 
-  const openWhatsApp = () => {
+  // Modified to accept parameters instead of relying on state
+  const openWhatsApp = (bookingDetails = null) => {
+    // Use passed parameters or fall back to current state
+    const name = bookingDetails?.customerName || customerName;
+    const phone = bookingDetails?.customerPhone || customerPhone;
+    const address = bookingDetails?.customerAddress || customerAddress;
+
     // Prepare booking data for WhatsApp message
     const bookingData = `
-      Name: ${customerName}
-      Phone: ${customerPhone}
-      Address: ${customerAddress}
+      Name: ${name}
+      Phone: ${phone}
+      Address: ${address}
       Pickup: ${pickupDate ? new Date(pickupDate).toLocaleDateString() : ""} ${pickupTimeSlot || ""}
       Delivery: ${deliveryDate ? new Date(deliveryDate).toLocaleDateString() : ""} ${deliveryTimeSlot || ""}
       Order: ${selectedClothes.map((item) => `${item.quantity} x ${item.name}`).join(", ")}
@@ -245,14 +251,15 @@ const PricingCalculator = ({
           "Your laundry booking has been submitted successfully. We'll contact you soon!",
       });
 
-      // Clear the form
-      setCustomerName("");
-      setCustomerPhone("");
-      setCustomerAddress("");
-      setUploadedFile(null);
-      setShowPaymentModal(true);
-
-      return data;
+      // Return the current form data before clearing it
+      return {
+        data,
+        formData: {
+          customerName,
+          customerPhone,
+          customerAddress,
+        },
+      };
     } catch (error) {
       console.error("Error saving booking:", error);
       throw error;
@@ -294,14 +301,24 @@ const PricingCalculator = ({
         variant: "destructive",
       });
       setShowPaymentModal(false);
-      setIsClicked(false); // 🔥 Important: Reset click state if early exit
+      setIsClicked(false);
       return;
     }
 
     setLoading(true);
     try {
-      await saveBookingToDatabase(user.id);
-      openWhatsApp();
+      // Save booking and get the form data before it's cleared
+      const result = await saveBookingToDatabase(user.id);
+
+      // Open WhatsApp with the saved form data
+      openWhatsApp(result.formData);
+
+      // Clear the form after WhatsApp is opened
+      setCustomerName("");
+      setCustomerPhone("");
+      setCustomerAddress("");
+      setUploadedFile(null);
+      setShowPaymentModal(true);
     } catch (error) {
       console.error("Error submitting booking:", error);
       toast({
@@ -309,7 +326,7 @@ const PricingCalculator = ({
         description: `Failed to submit booking: ${error.message}`,
         variant: "destructive",
       });
-      setIsClicked(false); // 🔥 Important: Allow retry on error
+      setIsClicked(false);
     } finally {
       setLoading(false);
     }
@@ -445,8 +462,6 @@ const PricingCalculator = ({
 
         {/* Payment Modal */}
         <Dialog
-          // open={showPaymentModal}
-          // onOpenChange={setShowPaymentModal}
           open={showPaymentModal}
           onOpenChange={(isOpen) => {
             setShowPaymentModal(isOpen);
@@ -536,7 +551,7 @@ const PricingCalculator = ({
 
                 <Button
                   variant="outline"
-                  onClick={openWhatsApp}
+                  onClick={() => openWhatsApp()}
                   className="flex items-center gap-2"
                 >
                   <MessageCircle className="w-4 h-4" />
