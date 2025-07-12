@@ -202,6 +202,7 @@ const PricingCalculator = ({
         console.error("Supabase booking error:", error);
         throw error;
       }
+      openWhatsApp();
 
       console.log("Booking saved successfully:", data);
 
@@ -246,10 +247,10 @@ const PricingCalculator = ({
       });
 
       // Clear the form
-      setCustomerName("");
-      setCustomerPhone("");
-      setCustomerAddress("");
-      setUploadedFile(null);
+      // setCustomerName("");
+      // setCustomerPhone("");
+      // setCustomerAddress("");
+      // setUploadedFile(null);
       setShowPaymentModal(true);
 
       return data;
@@ -301,7 +302,7 @@ const PricingCalculator = ({
     setLoading(true);
     try {
       await saveBookingToDatabase(user.id);
-      openWhatsApp();
+      // openWhatsApp();
     } catch (error) {
       console.error("Error submitting booking:", error);
       toast({
