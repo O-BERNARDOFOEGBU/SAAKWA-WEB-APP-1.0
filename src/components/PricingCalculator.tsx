@@ -42,6 +42,7 @@ const PricingCalculator = ({
       title: "Almost done!",
       description: "Please input your phone number and address",
       duration: 7000,
+      className: "bg-blue-100 text-yellow-900 border border-yellow-300",
     });
   }, [toast]);
 
@@ -164,7 +165,7 @@ const PricingCalculator = ({
       Total: ₦${totalAmount.toLocaleString()}
     `.trim();
 
-    const message = `Hi! I need help confirming my payment for Saakwa Laundry booking: \n${bookingData}`;
+    const message = `Hi! I need help confirming my payment for Saakwa Laundry booking: \n\n${bookingData}`;
     const phoneNumber = "2349160391653";
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(
       message
