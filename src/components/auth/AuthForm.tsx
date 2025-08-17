@@ -245,6 +245,7 @@ const AuthForm = ({ onSuccess, onClose }: AuthFormProps) => {
       {!isResetMode && (
         <div className="text-center">
           <button
+            type="button"
             onClick={() => setIsResetMode(true)}
             className="text-blue-600 hover:underline text-sm"
           >

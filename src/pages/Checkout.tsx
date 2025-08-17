@@ -4,14 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import ClothingSelector from "@/components/ClothingSelector";
 import SchedulePicker from "@/components/SchedulePicker";
 import PricingCalculator from "@/components/PricingCalculator";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 const Checkout = () => {
   const [currentStep, setCurrentStep] = useState("home");
@@ -23,7 +16,6 @@ const Checkout = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const { user } = useAuth();
-  // const { toast } = useToast();
 
   const handleSelectPricing = () => {
     if (!user) {
