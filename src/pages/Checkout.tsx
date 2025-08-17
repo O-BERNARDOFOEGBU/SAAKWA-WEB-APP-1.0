@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-// import { Button } from "@/components/ui/button";
 import AuthForm from "@/components/auth/AuthForm";
 import { useAuth } from "@/hooks/useAuth";
 import ClothingSelector from "@/components/ClothingSelector";
@@ -12,12 +11,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 const Checkout = () => {
   const [currentStep, setCurrentStep] = useState("home");
@@ -27,15 +21,9 @@ const Checkout = () => {
   const [pickupTimeSlot, setPickupTimeSlot] = useState(null);
   const [deliveryTimeSlot, setDeliveryTimeSlot] = useState(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [PasswordVisible, SetPasswordVisible] = useState(false);
-  const [fullName, setFullName] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [isResetMode, setIsResetMode] = useState(false);
 
   const { user } = useAuth();
-  const { toast } = useToast();
+  // const { toast } = useToast();
 
   const handleSelectPricing = () => {
     if (!user) {
@@ -43,144 +31,6 @@ const Checkout = () => {
       return;
     }
     setCurrentStep("pricing");
-  };
-
-  const handlePasswordReset = async () => {
-    if (!email) {
-      toast({
-        title: "Email Required",
-        description: "Please enter your email address to reset password",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth`,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Password Reset Email Sent",
-        description: "Please check your email for password reset instructions.",
-      });
-
-      setIsResetMode(false);
-      setEmail("");
-    } catch (error) {
-      console.error("Password reset error:", error);
-      toast({
-        title: "Reset Error",
-        description:
-          error.message || "Failed to send reset email. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignUp = async () => {
-    if (!email || !password || !fullName) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all fields",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (password.length < 6) {
-      toast({
-        title: "Password Too Short",
-        description: "Password must be at least 6 characters long",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const redirectUrl = `${window.location.origin}/`;
-
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            full_name: fullName,
-          },
-        },
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Account Created!",
-        description: "Please check your email to verify your account.",
-      });
-
-      setShowAuthModal(false);
-      setEmail("");
-      setPassword("");
-      setFullName("");
-      setCurrentStep("pricing");
-    } catch (error) {
-      console.error("Sign up error:", error);
-      toast({
-        title: "Sign Up Error",
-        description:
-          error.message || "Failed to create account. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSignIn = async () => {
-    if (!email || !password) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in email and password",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Welcome back!",
-        description: "You have successfully signed in.",
-      });
-
-      setShowAuthModal(false);
-      setEmail("");
-      setPassword("");
-      setCurrentStep("pricing");
-    } catch (error) {
-      console.error("Sign in error:", error);
-      toast({
-        title: "Sign In Error",
-        description:
-          error.message || "Failed to sign in. Please check your credentials.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
   };
 
   const renderStep = () => {
@@ -290,134 +140,6 @@ const Checkout = () => {
       {renderStep()}
       <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>
-              {isResetMode ? "Reset Password" : "Sign In or Create Account"}
-            </DialogTitle>
-            <DialogDescription>
-              {isResetMode
-                ? "Enter your email to receive password reset instructions"
-                : "Sign in to your account or create a new one to book our services"}
-            </DialogDescription>
-          </DialogHeader>
-
-          {/* <div className="space-y-4">
-            <div>
-              <Label htmlFor="auth-email">Email *</Label>
-              <Input
-                id="auth-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                required
-              />
-            </div>
-
-            {!isResetMode && (
-              <>
-                <div>
-                  <Label htmlFor="auth-password">Password *</Label>
-                  <div className="relative">
-                    <Input
-                      id="auth-password"
-                      type={PasswordVisible ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter password (min 6 characters)"
-                      required
-                      minLength={6}
-                      className="pr-10"
-                    />
-                    <Button
-                      type="button"
-                      onClick={() => SetPasswordVisible(!PasswordVisible)}
-                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
-                    >
-                      <FontAwesomeIcon
-                        icon={PasswordVisible ? faEyeSlash : faEye}
-                      />
-                    </Button>
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="auth-name">
-                    Full Name (for new accounts)
-                  </Label>
-                  <Input
-                    id="auth-name"
-                    type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Enter your full name"
-                  />
-                </div>
-              </>
-            )}
-
-            <div className="flex gap-2">
-              {isResetMode ? (
-                <>
-                  <Button
-                    onClick={handlePasswordReset}
-                    disabled={loading}
-                    className="flex-1"
-                  >
-                    {loading ? "Sending..." : "Send Reset Email"}
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      setIsResetMode(false);
-                      setEmail("");
-                    }}
-                    variant="outline"
-                    className="flex-1"
-                  >
-                    Back to Sign In
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    onClick={handleSignIn}
-                    disabled={loading}
-                    className="flex-1"
-                    variant="outline"
-                  >
-                    {loading ? "Signing In..." : "Sign In"}
-                  </Button>
-
-                  <Button
-                    onClick={handleSignUp}
-                    disabled={loading}
-                    className="flex-1"
-                  >
-                    {loading ? "Creating..." : "Create Account"}
-                  </Button>
-                </>
-              )}
-            </div>
-
-            {!isResetMode && (
-              <div className="text-center">
-                <button
-                  type="button"
-                  onClick={() => setIsResetMode(true)}
-                  className="text-blue-600 hover:underline text-sm"
-                >
-                  Forgot your password?
-                </button>
-              </div>
-            )}
-
-            <p className="text-xs text-gray-500 text-center">
-              {isResetMode
-                ? "You'll receive an email with instructions to reset your password"
-                : "Existing customers can sign in, new customers can create an account"}
-            </p>
-          </div> */}
-
           <AuthForm
             onSuccess={() => setCurrentStep("pricing")}
             onClose={() => setShowAuthModal(false)}
