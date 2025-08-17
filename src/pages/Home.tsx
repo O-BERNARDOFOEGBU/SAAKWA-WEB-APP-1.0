@@ -16,10 +16,7 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
-      <Header
-        showAuthModal={showAuthModal}
-        setShowAuthModal={setShowAuthModal}
-      />
+      <Header />
 
       {/* Hero Section */}
       <div className="relative overflow-hidden bg-white">
@@ -164,7 +161,7 @@ const Home = () => {
             </div>
             <div className="flex flex-col items-center">
               <Shield className="w-12 h-12 text-green-600 mb-4" />
-              <h3 className="font-semibold text-lg mb-2">Insured Service</h3>
+              <h3 className="font-semibold text-lg mb-2">Protected Service</h3>
               <p className="text-gray-600">
                 Your clothes are protected during transport
               </p>

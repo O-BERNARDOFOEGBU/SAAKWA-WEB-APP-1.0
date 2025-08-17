@@ -61,30 +61,30 @@ const SchedulePicker = ({
   const currentHour = now.getHours();
   const currentMinutes = now.getMinutes();
 
-  // Function to check if a date is Tuesday (2) or Saturday (6)
-  const isTuesdayOrSaturday = (date: Date) => {
+  // Function to check if a date is Thursday (4) or Saturday (6)
+  const isThursdayOrSaturday = (date: Date) => {
     const day = date.getDay();
-    return day === 2 || day === 6; // 2 = Tuesday, 6 = Saturday
+    return day === 4 || day === 6; // 4 = Thursday, 6 = Saturday
   };
 
   // Check if we can still book for today (before 4:30pm)
   const canBookToday =
     currentHour < 16 || (currentHour === 16 && currentMinutes < 30);
 
-  // For pickup dates: allow same day if it's Tue/Sat and before 5pm, or next day if it's Tue/Sat
+  // For pickup dates: allow same day if it's Thur/Sat and before 5pm, or next day if it's Thur/Sat
   const isPickupDateDisabled = (date: Date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const checkDate = new Date(date);
     checkDate.setHours(0, 0, 0, 0);
 
-    // If it's today and it's Tue/Sat and before 5pm, allow it
+    // If it's today and it's Thur/Sat and before 5pm, allow it
     if (checkDate.getTime() === today.getTime()) {
-      return !isTuesdayOrSaturday(checkDate) || !canBookToday;
+      return !isThursdayOrSaturday(checkDate) || !canBookToday;
     }
 
-    // For future dates, only allow if it's Tue/Sat and not in the past
-    return checkDate < today || !isTuesdayOrSaturday(checkDate);
+    // For future dates, only allow if it's Thur/Sat and not in the past
+    return checkDate < today || !isThursdayOrSaturday(checkDate);
   };
 
   // For delivery: minimum 2 days after pickup
@@ -98,7 +98,7 @@ const SchedulePicker = ({
     const minDate = new Date(minDeliveryDate);
     minDate.setHours(0, 0, 0, 0);
 
-    return checkDate < minDate || !isTuesdayOrSaturday(checkDate);
+    return checkDate < minDate || !isThursdayOrSaturday(checkDate);
   };
 
   return (
@@ -113,9 +113,9 @@ const SchedulePicker = ({
             Schedule Pickup & Delivery
           </h1>
           <p className="text-gray-600">
-            Choose your preferred pickup and delivery dates. We provide 48-72
-            hour service on Tuesdays and Saturdays only. You can book on Pickup
-            Day up until 4:30pm.
+            Choose your preferred pickup and delivery dates. We do Pickups and
+            Delivery on Thursdays and Saturdays only. You can book on Pickup
+            Days up until 4:30pm.
           </p>
         </div>
 
@@ -128,8 +128,9 @@ const SchedulePicker = ({
                 Pickup Date
               </CardTitle>
               <CardDescription>
-                When should we collect your clothes? (Tuesdays & Saturdays only)
-                {canBookToday && isTuesdayOrSaturday(now) && (
+                When should we collect your clothes? (Thursdays & Saturdays
+                only)
+                {canBookToday && isThursdayOrSaturday(now) && (
                   <span className="block text-green-600 font-medium mt-1">
                     ✅ You can still book for today (before 4:30pm)
                   </span>
@@ -170,13 +171,17 @@ const SchedulePicker = ({
               </Popover>
 
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                <label
+                  htmlFor="pickup-time-slot-0"
+                  className="text-sm font-medium text-gray-700 mb-2 block"
+                >
                   Preferred Time Slot *
                 </label>
                 <div className="grid grid-cols-1 gap-2">
-                  {timeSlots.map((slot) => (
+                  {timeSlots.map((slot, idx) => (
                     <Button
                       key={slot}
+                      id={idx === 0 ? "pickup-time-slot-0" : undefined}
                       variant={pickupTimeSlot === slot ? "default" : "outline"}
                       className="justify-start text-sm"
                       size="sm"
@@ -199,7 +204,7 @@ const SchedulePicker = ({
                 Delivery Date
               </CardTitle>
               <CardDescription>
-                When should we return your clean clothes? (Tuesdays & Saturdays
+                When should we return your clean clothes? (Thursdays & Saturdays
                 only)
               </CardDescription>
             </CardHeader>
@@ -238,13 +243,17 @@ const SchedulePicker = ({
               </Popover>
 
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">
+                <label
+                  htmlFor="delivery-time-slot-0"
+                  className="text-sm font-medium text-gray-700 mb-2 block"
+                >
                   Preferred Time Slot *
                 </label>
                 <div className="grid grid-cols-1 gap-2">
-                  {timeSlots.map((slot) => (
+                  {timeSlots.map((slot, idx) => (
                     <Button
                       key={slot}
+                      id={idx === 0 ? "delivery-time-slot-0" : undefined}
                       variant={
                         deliveryTimeSlot === slot ? "default" : "outline"
                       }
@@ -270,7 +279,7 @@ const SchedulePicker = ({
           <CardContent>
             <div className="grid md:grid-cols-3 gap-4 text-sm">
               <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-blue-600 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-blue-600 rounded-full mt-2" />
                 <div>
                   <div className="font-semibold">Pickup Areas</div>
                   <div className="text-gray-600">
@@ -279,14 +288,16 @@ const SchedulePicker = ({
                 </div>
               </div>
               <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-green-600 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-green-600 rounded-full mt-2" />
                 <div>
                   <div className="font-semibold">Service Days</div>
-                  <div className="text-gray-600">Tuesdays & Saturdays only</div>
+                  <div className="text-gray-600">
+                    Thursdays & Saturdays only
+                  </div>
                 </div>
               </div>
               <div className="flex items-start space-x-2">
-                <div className="w-2 h-2 bg-purple-600 rounded-full mt-2"></div>
+                <div className="w-2 h-2 bg-purple-600 rounded-full mt-2" />
                 <div>
                   <div className="font-semibold">Booking Cutoff</div>
                   <div className="text-gray-600">Same day until 4:30 PM</div>
