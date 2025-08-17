@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
+import AuthForm from "@/components/auth/AuthForm";
 import { useAuth } from "@/hooks/useAuth";
 import ClothingSelector from "@/components/ClothingSelector";
 import SchedulePicker from "@/components/SchedulePicker";
@@ -300,7 +301,7 @@ const Checkout = () => {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             <div>
               <Label htmlFor="auth-email">Email *</Label>
               <Input
@@ -415,7 +416,12 @@ const Checkout = () => {
                 ? "You'll receive an email with instructions to reset your password"
                 : "Existing customers can sign in, new customers can create an account"}
             </p>
-          </div>
+          </div> */}
+
+          <AuthForm
+            onSuccess={() => setCurrentStep("pricing")}
+            onClose={() => setShowAuthModal(false)}
+          />
         </DialogContent>
       </Dialog>
     </>
