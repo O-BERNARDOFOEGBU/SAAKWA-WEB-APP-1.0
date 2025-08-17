@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
 const Checkout = () => {
   const [currentStep, setCurrentStep] = useState("home");
@@ -26,6 +28,7 @@ const Checkout = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [PasswordVisible, SetPasswordVisible] = useState(false);
   const [fullName, setFullName] = useState("");
   const [loading, setLoading] = useState(false);
   const [isResetMode, setIsResetMode] = useState(false);
@@ -314,15 +317,27 @@ const Checkout = () => {
               <>
                 <div>
                   <Label htmlFor="auth-password">Password *</Label>
-                  <Input
-                    id="auth-password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter password (min 6 characters)"
-                    required
-                    minLength={6}
-                  />
+                  <div className="relative">
+                    <Input
+                      id="auth-password"
+                      type={PasswordVisible ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter password (min 6 characters)"
+                      required
+                      minLength={6}
+                      className="pr-10"
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => SetPasswordVisible(!PasswordVisible)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
+                    >
+                      <FontAwesomeIcon
+                        icon={PasswordVisible ? faEyeSlash : faEye}
+                      />
+                    </Button>
+                  </div>
                 </div>
 
                 <div>
