@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ArrowLeft, MessageCircle, Copy, Check } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const PricingCalculator = ({
   selectedClothes,
@@ -24,6 +25,7 @@ const PricingCalculator = ({
   deliveryTimeSlot,
   onBack,
 }) => {
+  const navigate = useNavigate();
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
@@ -277,6 +279,13 @@ const PricingCalculator = ({
     setLoading(true);
     try {
       await saveBookingToDatabase(user.id);
+      setShowPaymentModal(false);
+      localStorage.removeItem("pickupDate");
+      localStorage.removeItem("deliveryDate");
+      localStorage.removeItem("pickupTimeSlot");
+      localStorage.removeItem("deliveryTimeSlot");
+      localStorage.removeItem("selectedClothes");
+      navigate("/");
     } catch (error) {
       console.error("Error submitting booking:", error);
       toast({

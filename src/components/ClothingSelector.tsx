@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Plus, Minus, ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/select";
 import { clothingCategories, ClothingItem } from "@/utils/clothing-items";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ClothingSelectorProps {
   selectedClothes: ClothingItem[];
