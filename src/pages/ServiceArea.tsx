@@ -204,7 +204,7 @@ const ServiceArea = () => {
             </p>
             <Link
               className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg rounded-md transition-colors"
-              to={"/select-clothing-items"}
+              to={"/checkout"}
             >
               Start Your Order
             </Link>
