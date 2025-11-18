@@ -10,9 +10,15 @@ import {
 } from "@/components/ui/card";
 import Header from "@/components/Header";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useBookings } from "@/hooks/useBookings";
 
 const Home = () => {
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const { user, loading } = useAuth();
+  const { bookings } = useBookings(user?.id);
+  console.log("user", user);
+  console.log("bookings", bookings);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">

@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import Home from "./pages/Home";
 import ServiceArea from "./pages/ServiceArea";
 import Checkout from "./pages/Checkout";
+import OrderHistory from "./pages/OrderHistory";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/service-area" element={<ServiceArea />} />
+            <Route path="/order-history" element={<OrderHistory />} />
             <Route path="/" element={<Home />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
