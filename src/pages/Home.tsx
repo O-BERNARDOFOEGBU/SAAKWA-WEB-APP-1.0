@@ -1,210 +1,131 @@
-import { useState } from "react";
-import { MapPin, Star, Users, Clock, Shield } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Building2, Bike, ShieldCheck, Sparkles, Clock3, Route } from "lucide-react";
 import Header from "@/components/Header";
 import { Link } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
-import { useBookings } from "@/hooks/useBookings";
 
 const Home = () => {
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const { user, loading } = useAuth();
-  const { bookings } = useBookings(user?.id);
-  console.log("user", user);
-  console.log("bookings", bookings);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_15%_20%,#dbeafe_0%,#fef3c7_35%,#fee2e2_70%,#e0e7ff_100%)]">
       <Header />
 
-      {/* Hero Section */}
-      <div className="relative overflow-hidden bg-white">
-        <div className="container mx-auto px-4 py- sm:py-24">
-          <div className="text-center">
-            <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 mb-6">
-              <span className="text-blue-600">Saakwa</span> Laundry
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(115deg,rgba(37,99,235,0.08),rgba(16,185,129,0.08),rgba(244,114,182,0.1))]" />
+        <div className="container relative mx-auto grid gap-8 px-4 py-12 lg:grid-cols-2 lg:py-16">
+          <div className="space-y-5">
+            <p className="inline-flex rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-blue-700">
+              Saakwa Marketplace in Lekki
+            </p>
+            <h1 className="text-4xl font-black leading-tight text-slate-900 sm:text-5xl">
+              Laundry Pickup and Delivery, now powered by a three-sided network.
             </h1>
-            <p className="text-xl sm:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Premium laundry service from Osapa to VI, Marina & Heart of Lekki.
-              <span className="text-blue-600 font-semibold"> Save 25% </span>
-              with convenient pickup & delivery.
+            <p className="max-w-xl text-lg text-slate-700">
+              Users compare top laundry houses, riders handle doorstep logistics, and laundry partners process orders end-to-end with live tracking.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+            <div className="flex flex-wrap gap-3">
               <Link
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg rounded-md transition-colors"
-                to={"/checkout"}
+                className="rounded-md bg-blue-600 px-6 py-3 text-white transition-colors hover:bg-blue-700"
+                to="/marketplace/laundries"
               >
-                Book Laundry Service
+                Compare Laundry Houses
               </Link>
               <Link
-                to={"/service-area"}
-                className="border-blue-600 border text-blue-600 hover:bg-blue-50 px-8 py-3 text-lg rounded-md transition-colors"
+                className="rounded-md bg-emerald-600 px-6 py-3 text-white transition-colors hover:bg-emerald-700"
+                to="/marketplace/onboarding/laundry-house"
               >
-                Check Service Area
+                List a Laundry House
+              </Link>
+              <Link
+                className="rounded-md bg-fuchsia-600 px-6 py-3 text-white transition-colors hover:bg-fuchsia-700"
+                to="/marketplace/onboarding/rider"
+              >
+                Become a Rider
+              </Link>
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-3 shadow-xl backdrop-blur">
+            <img
+              src="https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?auto=format&fit=crop&w=1200&q=80"
+              alt="Woman joyfully checking freshly cleaned clothes"
+              className="h-full w-full rounded-2xl object-cover"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="py-12">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-slate-900">Built for Users, Laundry Houses, and Riders</h2>
+          <div className="mt-6 grid gap-5 md:grid-cols-3">
+            <div className="rounded-2xl border border-blue-200 bg-white/80 p-6 shadow-sm">
+              <Building2 className="h-8 w-8 text-blue-600" />
+              <h3 className="mt-3 text-xl font-semibold text-slate-900">Users</h3>
+              <p className="mt-2 text-slate-700">
+                Compare laundry houses by service price, ratings, turnaround, and distance before booking pickup and delivery.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-emerald-200 bg-white/80 p-6 shadow-sm">
+              <Sparkles className="h-8 w-8 text-emerald-600" />
+              <h3 className="mt-3 text-xl font-semibold text-slate-900">Laundry Houses</h3>
+              <p className="mt-2 text-slate-700">
+                Onboard your business, add service listings, accept or auto-confirm orders, and update to RECEIVED, PROCESSING, READY.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-fuchsia-200 bg-white/80 p-6 shadow-sm">
+              <Bike className="h-8 w-8 text-fuchsia-600" />
+              <h3 className="mt-3 text-xl font-semibold text-slate-900">Riders</h3>
+              <p className="mt-2 text-slate-700">
+                Onboard with your location and receive only nearby assignments. Rider matching is limited to orders within 5km.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="pb-14">
+        <div className="container mx-auto px-4">
+          <div className="grid gap-5 md:grid-cols-3">
+            <div className="rounded-2xl bg-blue-600 p-6 text-white shadow-lg">
+              <Route className="h-7 w-7" />
+              <h3 className="mt-3 text-xl font-semibold">Live Movement Tracking</h3>
+              <p className="mt-2 text-blue-100">
+                Users receive realtime rider coordinates and order state updates from pickup to delivery.
+              </p>
+            </div>
+            <div className="rounded-2xl bg-amber-500 p-6 text-white shadow-lg">
+              <Clock3 className="h-7 w-7" />
+              <h3 className="mt-3 text-xl font-semibold">Faster Operations</h3>
+              <p className="mt-2 text-amber-100">
+                Laundry dashboards streamline intake and processing states while riders update delivery milestones.
+              </p>
+            </div>
+            <div className="rounded-2xl bg-indigo-600 p-6 text-white shadow-lg">
+              <ShieldCheck className="h-7 w-7" />
+              <h3 className="mt-3 text-xl font-semibold">Approval Controlled</h3>
+              <p className="mt-2 text-indigo-100">
+                Hidden admin workflow validates and approves rider and laundry onboarding before they go live.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white/85 px-5 py-4 text-sm text-slate-600">
+            <p>Saakwa marketplace is live across Lekki, Lagos.</p>
+            <div className="flex gap-3">
+              <Link className="text-blue-700 hover:underline" to="/checkout">
+                Classic Checkout
+              </Link>
+              <Link className="text-blue-700 hover:underline" to="/marketplace/laundries">
+                Marketplace
+              </Link>
+              <Link className="text-slate-400 hover:text-slate-500" to="/_saakwa/internal/admin-onboarding-approvals">
+                .
               </Link>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Features Section */}
-      <div className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            Why Choose Saakwa?
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="text-center hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Star className="w-8 h-8 text-blue-600" />
-                </div>
-                <CardTitle className="text-xl">Premium Quality</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-gray-600">
-                  Professional laundry service with attention to detail. Your
-                  clothes are treated with care at our Laundry Houses.
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MapPin className="w-8 h-8 text-green-600" />
-                </div>
-                <CardTitle className="text-xl">Convenient Pickup</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-gray-600">
-                  Door-to-door service from VI, Marina, and Heart of Lekki.
-                  Schedule pickup and delivery at your convenience.
-                </CardDescription>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-purple-600" />
-                </div>
-                <CardTitle className="text-xl">25% Savings</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-gray-600">
-                  Get premium laundry service at 25% less than your local
-                  Laundry House prices, plus the convenience of delivery.
-                </CardDescription>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-
-      {/* How It Works */}
-      <div className="py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            How It Works
-          </h2>
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                1
-              </div>
-              <h3 className="font-semibold text-lg mb-2">Select Clothes</h3>
-              <p className="text-gray-600">
-                Choose your clothing items and get instant pricing
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                2
-              </div>
-              <h3 className="font-semibold text-lg mb-2">Schedule Pickup</h3>
-              <p className="text-gray-600">
-                Pick convenient pickup and delivery dates
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                3
-              </div>
-              <h3 className="font-semibold text-lg mb-2">We Collect</h3>
-              <p className="text-gray-600">
-                Our rider picks up your clothes on schedule
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">
-                4
-              </div>
-              <h3 className="font-semibold text-lg mb-2">Fresh Delivery</h3>
-              <p className="text-gray-600">
-                Clean, fresh clothes delivered to your door
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Trust Indicators */}
-      <div className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8 text-center">
-            <div className="flex flex-col items-center">
-              <Clock className="w-12 h-12 text-blue-600 mb-4" />
-              <h3 className="font-semibold text-lg mb-2">Quick Turnaround</h3>
-              <p className="text-gray-600">48-72 hour service guaranteed</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <Shield className="w-12 h-12 text-green-600 mb-4" />
-              <h3 className="font-semibold text-lg mb-2">Protected Service</h3>
-              <p className="text-gray-600">
-                Your clothes are protected during transport
-              </p>
-            </div>
-            <div className="flex flex-col items-center">
-              <Star className="w-12 h-12 text-yellow-500 mb-4" />
-              <h3 className="font-semibold text-lg mb-2">Trusted Partner</h3>
-              <p className="text-gray-600">
-                Working with established Laundry Houses
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="py-16 bg-blue-600">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">
-            Ready to Experience Premium Laundry Service?
-          </h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Join hundreds of satisfied customers in VI, Marina & Heart of Lekki
-          </p>
-          <Link
-            className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3 text-lg rounded-md transition-colors"
-            to={"/checkout"}
-          >
-            Start Your Order
-          </Link>
-          <div className="mt-auto pt-12">
-            <p className=" text-gray-300">
-              Saakwa – Powered by Oparantho Ventures
-            </p>
-          </div>
-        </div>
-      </div>
+      </section>
     </div>
   );
 };

@@ -32,6 +32,15 @@ const Header = () => {
                 <Button
                   variant="outline"
                   size="sm"
+                  onClick={() => navigate("/marketplace/laundries")}
+                  className="flex items-center gap-2"
+                >
+                  Marketplace
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => navigate("/order-history")}
                   className="flex items-center gap-2"
                 >
